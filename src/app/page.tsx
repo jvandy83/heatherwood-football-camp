@@ -2,64 +2,273 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      {/* Hero */}
+      <header className="relative overflow-hidden bg-gradient-to-b from-sky-100 to-sky-50/80 px-6 pt-12 pb-16 sm:px-8 sm:pt-16 sm:pb-20">
+        <div className="mx-auto max-w-3xl text-center">
+          <Image
+            src="/football_camp_logo.png"
+            alt="Heatherwood Football Camp"
+            width={280}
+            height={120}
+            className="mx-auto mb-6 h-auto w-48 sm:w-64"
+            priority
+          />
+          <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-sky-600">
+            Boulder Summer Youth Football Camp
           </p>
+          <h1 className="text-4xl font-bold tracking-tight text-slate-800 sm:text-5xl">
+            Heatherwood Football Camp
+          </h1>
+          <p className="mt-4 text-lg text-slate-600 sm:text-xl">
+            Small-Group • Skills-Focused • Community-Based
+          </p>
+          <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-4 rounded-2xl bg-white/80 px-6 py-4 shadow-sm ring-1 ring-sky-200/60">
+            <span className="font-semibold text-slate-800">Starts June 1st</span>
+            <span className="text-slate-400">•</span>
+            <span className="text-slate-700">Ages 8–12</span>
+            <span className="text-slate-400">•</span>
+            <span className="text-slate-700">Non-contact</span>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+      </header>
+
+      <main className="mx-auto max-w-3xl px-6 py-12 sm:px-8 sm:py-16">
+        {/* Intro */}
+        <section className="mb-14">
+          <p className="text-lg leading-relaxed text-slate-600">
+            This camp started from a simple idea: a youth football option in
+            Boulder that prioritizes quality instruction, safety, and small
+            groups. We will run the camp based on level of interest and seats
+            filled — we know we can fill one week and may extend to 2 or 3
+            weeks depending on demand. Full details below.
+          </p>
+          <p className="mt-4 text-slate-600">
+            The program is built around clear structure, age-appropriate
+            instruction, and realistic kid energy levels — not a large or
+            commercial camp.
+          </p>
+        </section>
+
+        {/* Camp Overview */}
+        <section className="mb-14">
+          <h2 className="mb-6 text-2xl font-bold text-slate-800">
+            Camp Overview
+          </h2>
+          <ul className="space-y-3 text-slate-700">
+            <li className="flex gap-3">
+              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400" />
+              <span>
+                <strong>Ages:</strong> 8–12
+              </span>
+            </li>
+            <li className="flex gap-3">
+              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400" />
+              <span>
+                <strong>Capacity:</strong> 20 kids total (hard cap)
+              </span>
+            </li>
+            <li className="flex gap-3">
+              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400" />
+              <span>
+                <strong>Staffing:</strong> Lead coach + 1 assistant
+              </span>
+            </li>
+            <li className="flex gap-3">
+              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400" />
+              <span>
+                <strong>Focus:</strong> Football fundamentals, coordination,
+                confidence, teamwork
+              </span>
+            </li>
+            <li className="flex gap-3">
+              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400" />
+              <span>
+                <strong>Contact level:</strong> Non-contact (no full tackling)
+              </span>
+            </li>
+          </ul>
+          <p className="mt-4 text-slate-600">
+            Campers will be grouped by age for skill work and may combine for
+            controlled, non-contact scrimmage games with close supervision.
+          </p>
+        </section>
+
+        {/* Dates & Schedule */}
+        <section className="mb-14 rounded-2xl bg-sky-50/80 px-6 py-8 ring-1 ring-sky-200/50 sm:px-8">
+          <h2 className="mb-6 text-2xl font-bold text-slate-800">
+            Dates &amp; Schedule
+          </h2>
+          <p className="mb-4 text-slate-700">
+            <strong>One week, Monday–Friday.</strong> Camp starts{" "}
+            <strong>June 1st</strong>. Final dates for additional weeks (if we
+            run 2+ weeks) will be confirmed based on interest.
+          </p>
+          <p className="font-medium text-slate-800">
+            Daily schedule: <strong>9:00am – 2:00pm</strong>
+          </p>
+        </section>
+
+        {/* Location */}
+        <section className="mb-14">
+          <h2 className="mb-6 text-2xl font-bold text-slate-800">Location</h2>
+          <p className="text-slate-700">
+            <strong>Heatherwood Elementary School</strong> — outdoor grass field.
+          </p>
+        </section>
+
+        {/* Daily Itinerary */}
+        <section className="mb-14">
+          <h2 className="mb-6 text-2xl font-bold text-slate-800">
+            Daily Itinerary
+          </h2>
+          <ol className="space-y-3 text-slate-700">
+            <li className="flex gap-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-200 text-sm font-semibold text-sky-800">
+                1
+              </span>
+              Dynamic warm-up &amp; movement drills
+            </li>
+            <li className="flex gap-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-200 text-sm font-semibold text-sky-800">
+                2
+              </span>
+              Skill stations (throwing, catching, footwork, agility)
+            </li>
+            <li className="flex gap-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-200 text-sm font-semibold text-sky-800">
+                3
+              </span>
+              Water + snack break
+            </li>
+            <li className="flex gap-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-200 text-sm font-semibold text-sky-800">
+                4
+              </span>
+              Position fundamentals &amp; team drills
+            </li>
+            <li className="flex gap-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-200 text-sm font-semibold text-sky-800">
+                5
+              </span>
+              Non-contact scrimmage games
+            </li>
+            <li className="flex gap-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-200 text-sm font-semibold text-sky-800">
+                6
+              </span>
+              Cool-down and pickup window
+            </li>
+          </ol>
+          <p className="mt-4 text-slate-600">
+            The day is structured, active, and paced with frequent water breaks.
+          </p>
+        </section>
+
+        {/* What to Bring */}
+        <section className="mb-14 rounded-2xl bg-sky-50/80 px-6 py-8 ring-1 ring-sky-200/50 sm:px-8">
+          <h2 className="mb-6 text-2xl font-bold text-slate-800">
+            Refreshments &amp; What to Bring
+          </h2>
+          <p className="mb-4 text-slate-700">
+            Water and light snacks will be provided. Campers who may need
+            additional food are welcome to bring a small, labeled lunch or snack
+            from home.
+          </p>
+          <p className="mb-2 font-medium text-slate-800">Campers should bring:</p>
+          <ul className="list-inside list-disc space-y-1 text-slate-700">
+            <li>Refillable water bottle</li>
+            <li>Athletic shoes (cleats optional)</li>
+            <li>Sun protection (hat, sunscreen)</li>
+          </ul>
+        </section>
+
+        {/* Pricing */}
+        <section className="mb-14">
+          <h2 className="mb-6 text-2xl font-bold text-slate-800">Pricing</h2>
+          <div className="rounded-2xl border-2 border-sky-200 bg-white px-6 py-6 shadow-sm sm:px-8">
+            <p className="text-2xl font-bold text-slate-800">
+              $250 <span className="text-lg font-normal text-slate-600">per child (full week)</span>
+            </p>
+            <p className="mt-2 text-slate-700">
+              $50 sibling discount for additional children
+            </p>
+            <p className="mt-4 text-slate-600">
+              Pricing reflects small group size, strong supervision, and a
+              community-scale camp.
+            </p>
+          </div>
+        </section>
+
+        {/* Extended Supervision */}
+        <section className="mb-14">
+          <h2 className="mb-6 text-2xl font-bold text-slate-800">
+            Pickup &amp; Optional Extended Supervision
+          </h2>
+          <ul className="space-y-2 text-slate-700">
+            <li>Standard pickup at camp end time (2:00pm)</li>
+            <li>
+              <strong>Optional:</strong> Supervised walk to our nearby home —
+              kids may stay until 4:00pm for later pickup
+            </li>
+            <li>Calm, supervised downtime (snack / rest)</li>
+            <li>No additional charge</li>
+          </ul>
+          <p className="mt-4 text-slate-600">
+            Details will be confirmed for families who opt in.
+          </p>
+        </section>
+
+        {/* Safety */}
+        <section className="mb-14 rounded-2xl bg-slate-50 px-6 py-8 ring-1 ring-slate-200 sm:px-8">
+          <h2 className="mb-6 text-2xl font-bold text-slate-800">
+            Safety, Insurance &amp; Waivers
+          </h2>
+          <p className="mb-4 text-slate-700">
+            Camp will carry youth sports liability insurance. Parents will
+            complete:
+          </p>
+          <ul className="list-inside list-disc space-y-1 text-slate-700">
+            <li>Liability waiver</li>
+            <li>Emergency contact form</li>
+            <li>Medical authorization</li>
+          </ul>
+          <p className="mt-4 text-slate-700">
+            Clear safety rules and behavior expectations will be reviewed on Day
+            1.
+          </p>
+        </section>
+
+        {/* Next Steps / CTA */}
+        <section className="rounded-2xl bg-gradient-to-br from-sky-100 to-sky-50 px-6 py-10 ring-1 ring-sky-200/60 sm:px-10 sm:py-12">
+          <h2 className="mb-6 text-2xl font-bold text-slate-800">Register</h2>
+          <p className="mb-8 text-slate-700">
+            Ready to sign up? Use the registration form below. We&apos;ll follow
+            up with waiver forms and any final details.
+          </p>
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href="https://4larj8so.forms.app/summer-football-camp-registration-form-ages-7-11"
             target="_blank"
             rel="noopener noreferrer"
+            className="inline-block rounded-xl bg-sky-500 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
+            Register now →
           </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          <p className="mt-6 text-sm text-slate-600">
+            Questions?{" "}
+            <a
+              href="mailto:camp@heatherwoodfootball.com"
+              className="font-medium text-sky-600 underline hover:text-sky-700"
+            >
+              Get in touch
+            </a>
+          </p>
+        </section>
       </main>
+
+      <footer className="border-t border-slate-200 bg-slate-50/50 px-6 py-8 text-center text-sm text-slate-500 sm:px-8">
+        <p>Heatherwood Football Camp • Boulder, CO • Summer 2025</p>
+      </footer>
     </div>
   );
 }
