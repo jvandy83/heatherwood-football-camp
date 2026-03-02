@@ -188,10 +188,10 @@ export default function Home() {
           <h2 className="mb-6 text-2xl font-bold text-slate-800">Pricing</h2>
           <div className="rounded-2xl border-2 border-sky-200 bg-white px-6 py-6 shadow-sm sm:px-8">
             <p className="text-2xl font-bold text-slate-800">
-              $250 <span className="text-lg font-normal text-slate-600">per child (full week)</span>
+              $300 <span className="text-lg font-normal text-slate-600">per child (full week)</span>
             </p>
             <p className="mt-2 text-slate-700">
-              $50 sibling discount for additional children
+              $250 for sibling registrations (each additional child)
             </p>
             <p className="mt-4 text-slate-600">
               Pricing reflects small group size, strong supervision, and a
@@ -242,22 +242,29 @@ export default function Home() {
         {/* Next Steps / CTA */}
         <section className="rounded-2xl bg-gradient-to-br from-sky-100 to-sky-50 px-6 py-10 ring-1 ring-sky-200/60 sm:px-10 sm:py-12">
           <h2 className="mb-6 text-2xl font-bold text-slate-800">Register</h2>
-          <p className="mb-8 text-slate-700">
-            Ready to sign up? Use the registration form below. We&apos;ll follow
+          <p className="mb-6 text-slate-700">
+            Fill out the form and complete payment in one flow. We&apos;ll follow
             up with waiver forms and any final details.
           </p>
           <a
-            href="https://4larj8so.forms.app/summer-football-camp-registration-form-ages-7-11"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/register"
             className="inline-block rounded-xl bg-sky-500 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
           >
-            Register now →
+            Register →
           </a>
+          <p className="mt-4 text-sm text-slate-600">
+            Already registered and need to pay?{" "}
+            <a
+              href="/register/pay"
+              className="font-medium text-sky-600 underline hover:text-sky-700"
+            >
+              Complete payment here
+            </a>
+          </p>
           <p className="mt-6 text-sm text-slate-600">
             Questions?{" "}
             <a
-              href="mailto:camp@heatherwoodfootball.com"
+              href="mailto:heatherwoodfootballcamp@gmail.com"
               className="font-medium text-sky-600 underline hover:text-sky-700"
             >
               Get in touch
