@@ -1,6 +1,17 @@
 import Image from "next/image";
+import { getSpotsPerWeek } from "@/lib/sheets";
 
-export default function Home() {
+const DEFAULT_SPOTS = { week1: 20, week2: 20, week3: 20 };
+
+export default async function Home() {
+  let spots: Record<string, number> = DEFAULT_SPOTS;
+  try {
+    const fromSheet = await getSpotsPerWeek();
+    if (fromSheet != null) spots = fromSheet;
+  } catch {
+    // Sheet not configured or read failed; use default
+  }
+
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       {/* Hero */}
@@ -24,9 +35,9 @@ export default function Home() {
             Small-Group • Skills-Focused • Community-Based
           </p>
           <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-4 rounded-2xl bg-white/80 px-6 py-4 shadow-sm ring-1 ring-sky-200/60">
-            <span className="font-semibold text-slate-800">Starts June 1st</span>
+            <span className="font-semibold text-slate-800">Month of June</span>
             <span className="text-slate-400">•</span>
-            <span className="text-slate-700">Ages 8–12</span>
+            <span className="text-slate-700">Ages 7–11</span>
             <span className="text-slate-400">•</span>
             <span className="text-slate-700">Non-contact</span>
           </div>
@@ -40,8 +51,8 @@ export default function Home() {
             This camp started from a simple idea: a youth football option in
             Boulder that prioritizes quality instruction, safety, and small
             groups. We will run the camp based on level of interest and seats
-            filled — we know we can fill one week and may extend to 2 or 3
-            weeks depending on demand. Full details below.
+            filled — we run multiple weeks in June and add more as demand grows.
+            Full details below.
           </p>
           <p className="mt-4 text-slate-600">
             The program is built around clear structure, age-appropriate
@@ -59,7 +70,7 @@ export default function Home() {
             <li className="flex gap-3">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400" />
               <span>
-                <strong>Ages:</strong> 8–12
+                <strong>Ages:</strong> 7–11
               </span>
             </li>
             <li className="flex gap-3">
@@ -100,10 +111,29 @@ export default function Home() {
             Dates &amp; Schedule
           </h2>
           <p className="mb-4 text-slate-700">
-            <strong>One week, Monday–Friday.</strong> Camp starts{" "}
-            <strong>June 1st</strong>. Final dates for additional weeks (if we
-            run 2+ weeks) will be confirmed based on interest.
+            <strong>Camp runs through the month of June.</strong> Each week is
+            Monday–Friday. Register for one or more weeks; pricing is per week.
           </p>
+          <ul className="mb-4 list-inside list-disc space-y-1 text-slate-700">
+            <li>
+              Week 1: June 1–5
+              <span className="ml-1 text-sky-600 font-medium">
+                ({spots.week1} spots available)
+              </span>
+            </li>
+            <li>
+              Week 2: June 8–12
+              <span className="ml-1 text-sky-600 font-medium">
+                ({spots.week2} spots available)
+              </span>
+            </li>
+            <li>
+              Week 3: June 15–19
+              <span className="ml-1 text-sky-600 font-medium">
+                ({spots.week3} spots available)
+              </span>
+            </li>
+            </ul>
           <p className="font-medium text-slate-800">
             Daily schedule: <strong>9:00am – 2:00pm</strong>
           </p>

@@ -22,7 +22,7 @@ async function appendToSheet(row: string[]) {
   });
 
   const sheets = google.sheets({ version: "v4", auth });
-  const range = `${tabName}!A:K`;
+  const range = `${tabName}!A:L`;
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
       childName,
       childAge,
       registrationType,
+      week,
       emergencyName,
       emergencyPhone,
       medicalNotes,
@@ -78,6 +79,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Append to Google Sheet if configured (don't block registration on failure)
+    const weekLabels: Record<string, string> = {
+      week1: "Week 1: June 1–5",
+      week2: "Week 2: June 8–12",
+      week3: "Week 3: June 15–19",
+    };
     const sheetRow = [
       new Date().toISOString(),
       String(parentName),
@@ -90,6 +96,7 @@ export async function POST(request: NextRequest) {
       String(emergencyPhone),
       String(medicalNotes || ""),
       "Pending",
+      week ? weekLabels[week] ?? String(week) : "",
     ];
     try {
       await appendToSheet(sheetRow);

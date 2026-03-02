@@ -4,7 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const AGES = [8, 9, 10, 11, 12] as const;
+const AGES = [7, 8, 9, 10, 11] as const;
+
+const WEEKS = [
+  { value: "week1", label: "Week 1: June 1–5" },
+  { value: "week2", label: "Week 2: June 8–12" },
+  { value: "week3", label: "Week 3: June 15–19" },
+] as const;
 
 type RegistrationType = "first" | "sibling";
 
@@ -18,11 +24,24 @@ export default function RegisterPage() {
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState<number | "">("");
   const [registrationType, setRegistrationType] = useState<RegistrationType>("first");
+  const [week, setWeek] = useState<string>(WEEKS[0].value);
   const [emergencyName, setEmergencyName] = useState("");
   const [emergencyPhone, setEmergencyPhone] = useState("");
   const [medicalNotes, setMedicalNotes] = useState("");
   const [agreedToWaiver, setAgreedToWaiver] = useState(false);
   const [waiverModalOpen, setWaiverModalOpen] = useState(false);
+  const [spots, setSpots] = useState<Record<string, number>>({
+    week1: 20,
+    week2: 20,
+    week3: 20,
+  });
+
+  useEffect(() => {
+    fetch("/api/spots")
+      .then((res) => res.json())
+      .then((data) => setSpots(data))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!waiverModalOpen) return;
@@ -57,8 +76,8 @@ export default function RegisterPage() {
       setError("Child's name is required.");
       return;
     }
-    if (childAge === "" || childAge < 8 || childAge > 12) {
-      setError("Please select child's age (8–12).");
+    if (childAge === "" || childAge < 7 || childAge > 11) {
+      setError("Please select child's age (7–11).");
       return;
     }
     if (!emergencyName.trim()) {
@@ -67,6 +86,10 @@ export default function RegisterPage() {
     }
     if (!emergencyPhone.trim()) {
       setError("Emergency contact phone is required.");
+      return;
+    }
+    if (!week) {
+      setError("Please select a week.");
       return;
     }
     if (!agreedToWaiver) {
@@ -86,6 +109,7 @@ export default function RegisterPage() {
           childName: childName.trim(),
           childAge: Number(childAge),
           registrationType,
+          week,
           emergencyName: emergencyName.trim(),
           emergencyPhone: emergencyPhone.trim(),
           medicalNotes: medicalNotes.trim() || undefined,
@@ -217,7 +241,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <label htmlFor="childAge" className="mb-1 block text-sm font-medium text-slate-700">
-                Age (8–12) *
+                Age (7–11) *
               </label>
               <select
                 id="childAge"
@@ -260,6 +284,34 @@ export default function RegisterPage() {
                   <span>Sibling — $250</span>
                 </label>
               </div>
+            </div>
+            <div>
+              <label htmlFor="week" className="mb-1 block text-sm font-medium text-slate-700">
+                Which week? *
+              </label>
+              <select
+                id="week"
+                required
+                value={week}
+                onChange={(e) => setWeek(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-800 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              >
+                {WEEKS.map((w) => {
+                const available = spots[w.value];
+                const spotsLabel =
+                  available <= 0 ? " (Full)" : ` (${available} spots available)`;
+                return (
+                  <option
+                    key={w.value}
+                    value={w.value}
+                    disabled={available <= 0}
+                  >
+                    {w.label}
+                    {spotsLabel}
+                  </option>
+                );
+              })}
+              </select>
             </div>
           </fieldset>
 

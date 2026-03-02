@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Heatherwood Football Camp | Boulder Summer Youth Football",
   description:
-    "Small-group, skills-focused youth football camp in Boulder. Ages 8–12, non-contact. June 1st at Heatherwood Elementary. $300/week.",
+    "Small-group, skills-focused youth football camp in Boulder. Ages 7–11, non-contact. June at Heatherwood Elementary. $300/week.",
 };
 
 export default function RootLayout({
