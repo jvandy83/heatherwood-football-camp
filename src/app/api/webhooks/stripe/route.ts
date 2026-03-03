@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { sendMailgunEmail } from "@/lib/mailgun";
 import { markRegistrationPaidByEmail } from "@/lib/sheets";
+
+const PAYMENT_CONFIRMED_SUBJECT = "Heatherwood Football Camp — Payment received, you're confirmed";
+
+const PAYMENT_CONFIRMED_TEXT = `Thanks for registering for Heatherwood Football Camp. We've received your payment and your spot is confirmed.
+
+Camp runs 9:00am–2:00pm. If you signed up for optional extended pickup, you can pick up at Coach Jared's until 4:00pm (4783 Dorchester Cir, Boulder, CO 80301).
+
+If you have any questions, reply to this email or contact us at heatherwoodfootballcamp@gmail.com.
+
+See you at camp!`;
 
 export async function POST(request: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -63,6 +74,12 @@ export async function POST(request: NextRequest) {
         const updated = await markRegistrationPaidByEmail(email);
         if (!updated) {
           console.warn("Payment received but week was full or no Pending row found:", email);
+        } else {
+          await sendMailgunEmail({
+            to: email,
+            subject: PAYMENT_CONFIRMED_SUBJECT,
+            text: PAYMENT_CONFIRMED_TEXT,
+          });
         }
       } catch (err) {
         console.error("Failed to update sheet with payment:", err);

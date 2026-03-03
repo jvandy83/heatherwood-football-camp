@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendMailgunEmail } from "@/lib/mailgun";
+import {
+  buildRegistrationReceivedText,
+  getRegistrationSubject,
+} from "@/lib/registration-email";
 import { getSheetsClient, getSpotsPerWeek, sheetRange } from "@/lib/sheets";
 
 function splitName(full: string): [string, string] {
@@ -11,7 +16,9 @@ function splitName(full: string): [string, string] {
 async function appendToSheet(row: string[]): Promise<boolean> {
   const client = await getSheetsClient();
   if (!client) {
-    console.warn("Google Sheet not configured: GOOGLE_SHEET_ID or GOOGLE_SERVICE_ACCOUNT_JSON missing. Registration not saved to sheet.");
+    console.warn(
+      "Google Sheet not configured: GOOGLE_SHEET_ID or GOOGLE_SERVICE_ACCOUNT_JSON missing. Registration not saved to sheet.",
+    );
     return false;
   }
 
@@ -63,7 +70,7 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json(
         { message: "Missing required fields." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -71,10 +78,12 @@ export async function POST(request: NextRequest) {
     const paymentLinkSibling = process.env.STRIPE_PAYMENT_LINK_SIBLING;
 
     if (!paymentLinkFull || !paymentLinkSibling) {
-      console.error("STRIPE_PAYMENT_LINK_FULL or STRIPE_PAYMENT_LINK_SIBLING not set");
+      console.error(
+        "STRIPE_PAYMENT_LINK_FULL or STRIPE_PAYMENT_LINK_SIBLING not set",
+      );
       return NextResponse.json(
         { message: "Payment is not configured. Please contact us." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -84,7 +93,7 @@ export async function POST(request: NextRequest) {
       if (spots && spots[week] !== undefined && spots[week] <= 0) {
         return NextResponse.json(
           { message: "That week is full. Please choose another week." },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -98,30 +107,30 @@ export async function POST(request: NextRequest) {
     const [childFirst, childLast] = splitName(String(childName));
     const [parentFirst, parentLast] = splitName(String(parentName));
     const sheetRow = [
-      childFirst,                    // A: Camper First Name
-      childLast,                     // B: Camper Last Name
-      "",                            // C: Camper DOB (we don't collect)
-      String(childAge),              // D: Camper's Age
-      String(gradeEntering ?? ""),   // E: Grade (Entering Fall)
-      parentFirst,                   // F: Parent First Name
-      parentLast,                    // G: Parent Last Name
-      String(email),                 // H: Parent Email
-      String(phone),                 // I: Parent Phone
-      "",                            // J: Home Address (we don't collect)
-      String(emergencyName),         // K: Emergency Contact Name
-      String(emergencyPhone),        // L: Emergency Contact Phone
-      extendedPickup === "yes" ? "Yes" : "No",  // M: Later pickup interest
+      childFirst, // A: Camper First Name
+      childLast, // B: Camper Last Name
+      "", // C: Camper DOB (we don't collect)
+      String(childAge), // D: Camper's Age
+      String(gradeEntering ?? ""), // E: Grade (Entering Fall)
+      parentFirst, // F: Parent First Name
+      parentLast, // G: Parent Last Name
+      String(email), // H: Parent Email
+      String(phone), // I: Parent Phone
+      "", // J: Home Address (we don't collect)
+      String(emergencyName), // K: Emergency Contact Name
+      String(emergencyPhone), // L: Emergency Contact Phone
+      extendedPickup === "yes" ? "Yes" : "No", // M: Later pickup interest
       extendedPickup === "yes" ? String(pickupTime ?? "") : "", // N: Pickup time
       String(experienceLevel ?? ""), // O: Experience level
-      String(tshirtSize ?? ""),       // P: T-Shirt Size
-      String(medicalNotes ?? ""),    // Q: Allergies/medical
-      "",                            // R: Other instructions
-      "✓",                           // S: Waiver
-      "Website",                     // T: Submitter
-      new Date().toISOString(),      // U: Submission Date
-      "",                            // V: Submission ID
-      "Pending",                     // W: Payment Status
-      week ? weekLabels[week] ?? String(week) : "", // X: Week
+      String(tshirtSize ?? ""), // P: T-Shirt Size
+      String(medicalNotes ?? ""), // Q: Allergies/medical
+      "", // R: Other instructions
+      "✓", // S: Waiver
+      "Website", // T: Submitter
+      new Date().toISOString(), // U: Submission Date
+      "", // V: Submission ID
+      "Pending", // W: Payment Status
+      week ? (weekLabels[week] ?? String(week)) : "", // X: Week
     ];
     let sheetOk = false;
     try {
@@ -131,8 +140,25 @@ export async function POST(request: NextRequest) {
       // Still return payment URL so they can pay; sheet can be updated manually
     }
     if (!sheetOk) {
-      console.warn("Registration submitted but not saved to sheet (check Vercel env: GOOGLE_SHEET_ID, GOOGLE_SERVICE_ACCOUNT_JSON, and sheet shared with service account).");
+      console.warn(
+        "Registration submitted but not saved to sheet (check Vercel env: GOOGLE_SHEET_ID, GOOGLE_SERVICE_ACCOUNT_JSON, and sheet shared with service account).",
+      );
     }
+
+    const weekLabel = week ? (weekLabels[week] ?? String(week)) : undefined;
+
+    await sendMailgunEmail({
+      to: String(email),
+      subject: getRegistrationSubject(registrationType),
+      text: buildRegistrationReceivedText({
+        parentName,
+        childName,
+        weekLabel,
+        registrationType,
+        extendedPickup,
+        pickupTime,
+      }),
+    });
 
     const baseUrl =
       registrationType === "sibling" ? paymentLinkSibling : paymentLinkFull;
@@ -144,7 +170,7 @@ export async function POST(request: NextRequest) {
     console.error("Register API error:", err);
     return NextResponse.json(
       { message: "Something went wrong. Please try again." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
