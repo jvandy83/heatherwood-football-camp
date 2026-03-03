@@ -6,7 +6,7 @@ export async function GET() {
     const spots = await getSpotsPerWeek();
     if (spots === null) {
       return NextResponse.json({
-        week1: 20,
+        week1: 11,
         week2: 20,
         week3: 20,
       });
@@ -15,7 +15,7 @@ export async function GET() {
   } catch (err) {
     console.error("Spots API error:", err);
     return NextResponse.json(
-      { week1: 20, week2: 20, week3: 20 },
+      { week1: 11, week2: 20, week3: 20 },
       { status: 200 }
     );
   }

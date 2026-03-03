@@ -14,6 +14,8 @@ export default function PayOnlyPage() {
   const handlePay = async (type: RegistrationType) => {
     setError(null);
     setLoading(type);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     try {
       const res = await fetch("/api/pay", {
         method: "POST",
@@ -22,8 +24,10 @@ export default function PayOnlyPage() {
           email: email.trim() || undefined,
           registrationType: type,
         }),
+        signal: controller.signal,
       });
       const data = await res.json();
+      clearTimeout(timeoutId);
       if (!res.ok) {
         setError(data.message ?? "Something went wrong.");
         return;
@@ -33,8 +37,13 @@ export default function PayOnlyPage() {
         return;
       }
       setError("No payment link received.");
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err instanceof Error && err.name === "AbortError") {
+        setError("Request timed out. Please check your connection and try again.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(null);
     }
@@ -104,7 +113,7 @@ export default function PayOnlyPage() {
               disabled={loading !== null}
               className="flex-1 rounded-xl bg-sky-500 py-3 font-semibold text-white shadow-md transition hover:bg-sky-600 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
             >
-              {loading === "first" ? "Redirecting…" : "Pay $300 — First child"}
+              {loading === "first" ? "Redirecting…" : "Pay $325 — First child"}
             </button>
             <button
               type="button"

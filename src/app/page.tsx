@@ -1,17 +1,7 @@
 import Image from "next/image";
-import { getSpotsPerWeek } from "@/lib/sheets";
+import { SpotsList } from "./SpotsList";
 
-const DEFAULT_SPOTS = { week1: 20, week2: 20, week3: 20 };
-
-export default async function Home() {
-  let spots: Record<string, number> = DEFAULT_SPOTS;
-  try {
-    const fromSheet = await getSpotsPerWeek();
-    if (fromSheet != null) spots = fromSheet;
-  } catch {
-    // Sheet not configured or read failed; use default
-  }
-
+export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       {/* Hero */}
@@ -114,26 +104,7 @@ export default async function Home() {
             <strong>Camp runs through the month of June.</strong> Each week is
             Monday–Friday. Register for one or more weeks; pricing is per week.
           </p>
-          <ul className="mb-4 list-inside list-disc space-y-1 text-slate-700">
-            <li>
-              Week 1: June 1–5
-              <span className="ml-1 text-sky-600 font-medium">
-                ({spots.week1} spots available)
-              </span>
-            </li>
-            <li>
-              Week 2: June 8–12
-              <span className="ml-1 text-sky-600 font-medium">
-                ({spots.week2} spots available)
-              </span>
-            </li>
-            <li>
-              Week 3: June 15–19
-              <span className="ml-1 text-sky-600 font-medium">
-                ({spots.week3} spots available)
-              </span>
-            </li>
-            </ul>
+<SpotsList />
           <p className="font-medium text-slate-800">
             Daily schedule: <strong>9:00am – 2:00pm</strong>
           </p>
@@ -218,7 +189,7 @@ export default async function Home() {
           <h2 className="mb-6 text-2xl font-bold text-slate-800">Pricing</h2>
           <div className="rounded-2xl border-2 border-sky-200 bg-white px-6 py-6 shadow-sm sm:px-8">
             <p className="text-2xl font-bold text-slate-800">
-              $300 <span className="text-lg font-normal text-slate-600">per child (full week)</span>
+              $325 <span className="text-lg font-normal text-slate-600">per child (full week)</span>
             </p>
             <p className="mt-2 text-slate-700">
               $250 for sibling registrations (each additional child)
@@ -235,17 +206,28 @@ export default async function Home() {
           <h2 className="mb-6 text-2xl font-bold text-slate-800">
             Pickup &amp; Optional Extended Supervision
           </h2>
-          <ul className="space-y-2 text-slate-700">
-            <li>Standard pickup at camp end time (2:00pm)</li>
-            <li>
-              <strong>Optional:</strong> Supervised walk to our nearby home —
-              kids may stay until 4:00pm for later pickup
-            </li>
-            <li>Calm, supervised downtime (snack / rest)</li>
-            <li>No additional charge</li>
-          </ul>
-          <p className="mt-4 text-slate-600">
-            Details will be confirmed for families who opt in.
+          <p className="mb-4 text-slate-700">
+            Standard pickup at camp end time (2:00pm). Camp pickup may run until
+            2:30 while we wrap up equipment.
+          </p>
+          <p className="mb-4 text-slate-700">
+            <strong>Optional extended supervision:</strong> After camp, we will
+            wrap up equipment and walk as a group back to the coach&apos;s
+            house, located 2 blocks away. Kids may stay until 4:00pm for later
+            pickup. Calm, supervised downtime (snack / rest). No additional
+            charge.
+          </p>
+          <p className="text-slate-700">
+            <strong>Pickup at Coach Jared&apos;s house:</strong>
+            <br />
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=4783+Dorchester+Cir,+Boulder,+CO+80301"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-600 font-medium hover:underline"
+            >
+              4783 Dorchester Cir, Boulder, CO 80301
+            </a>
           </p>
         </section>
 

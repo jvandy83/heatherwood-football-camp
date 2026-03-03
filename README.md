@@ -17,7 +17,7 @@ Each registration is appended as a row when the form is submitted (before redire
 2. **Share the sheet:** Open your [Google Sheet](https://docs.google.com/spreadsheets/d/1RdxGCBVtxlXtGGhCTxMNZinyMfBMbCBo7W5z2bhwYag) and share it with the service account email (from the JSON, e.g. `xxx@xxx.iam.gserviceaccount.com`) with **Editor** access.
 3. **Env vars:** Set `GOOGLE_SHEET_ID` to the spreadsheet ID (from the URL), `GOOGLE_SHEET_TAB_NAME` to the tab name (e.g. `Sheet1` or the name of the tab you use), and `GOOGLE_SERVICE_ACCOUNT_JSON` to the full contents of the JSON key file (as a single line string).
 
-**Row format (columns A–L):** Timestamp, Parent Name, Email, Phone, Child Name, Child Age, Registration Type, Emergency Name, Emergency Phone, Medical Notes, Payment Status, Week. Add a header row in the sheet if needed.
+**Sheet columns (A–X):** Matches your existing forms.app layout (A–V); the site appends rows in that order and adds **W = Payment Status** ("Pending" → "Paid" via webhook) and **X = Week**. Add header labels in row 1 for columns W and X ("Payment Status", "Week") so you can see them. Existing rows can leave W/X blank.
 
 ### Stripe webhook (payment → sheet)
 

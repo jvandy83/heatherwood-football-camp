@@ -25,15 +25,17 @@ function getSheetsClient() {
 }
 
 /**
- * Find the first row with the given email and "Pending" payment status,
- * and update that row's Payment Status (column K) to "Paid".
+ * Find the first row with the given email and "Pending" or empty payment status.
+ * Treats empty W (existing forms.app rows) as Pending so they get marked Paid when they pay.
+ * Only marks as "Paid" if that week still has capacity. If row has no Week (X), treats as week 1 and fills X.
+ * Returns true if updated, false if skipped (e.g. week full).
  */
-export async function markRegistrationPaidByEmail(email: string): Promise<void> {
+export async function markRegistrationPaidByEmail(email: string): Promise<boolean> {
   const client = getSheetsClient();
-  if (!client) return;
+  if (!client) return false;
 
   const { sheets, sheetId, tabName } = client;
-  const range = `${tabName}!A2:K1000`;
+  const range = `${tabName}!A2:X1000`;
   const normalizedEmail = email.trim().toLowerCase();
 
   const { data } = await sheets.spreadsheets.values.get({
@@ -42,29 +44,48 @@ export async function markRegistrationPaidByEmail(email: string): Promise<void> 
   });
 
   const rows = data.values as string[][] | undefined;
-  if (!rows || rows.length === 0) return;
+  if (!rows || rows.length === 0) return false;
 
-  // Columns: A=0 Timestamp, B=1 Parent, C=2 Email, ... K=10 Payment Status
-  const emailColIndex = 2;
-  const statusColIndex = 10;
+  // Existing sheet: H=7 Email, W=22 Payment Status, X=23 Week
+  const emailColIndex = 7;
+  const statusColIndex = 22;
+  const weekColIndex = 23;
+
+  const spots = await getSpotsPerWeek();
+  if (!spots) return false;
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const rowEmail = (row[emailColIndex] ?? "").trim().toLowerCase();
     const status = (row[statusColIndex] ?? "").trim();
-    if (rowEmail === normalizedEmail && status === "Pending") {
-      const sheetRowNumber = i + 2; // data starts at row 2
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: sheetId,
-        range: `${tabName}!K${sheetRowNumber}`,
-        valueInputOption: "USER_ENTERED",
-        requestBody: {
-          values: [["Paid"]],
-        },
-      });
-      return;
+    const isPendingOrEmpty = status === "Pending" || status === "";
+    if (rowEmail !== normalizedEmail || !isPendingOrEmpty) continue;
+
+    const weekLabel = (row[weekColIndex] ?? "").trim();
+    const weekIdx = WEEK_LABELS.indexOf(weekLabel as (typeof WEEK_LABELS)[number]);
+    const weekKey = weekIdx >= 0 ? WEEK_KEYS[weekIdx] : null;
+    const effectiveWeek = weekKey ?? "week1";
+    if (spots[effectiveWeek] <= 0) {
+      return false;
     }
+
+    const sheetRowNumber = i + 2;
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${tabName}!W${sheetRowNumber}:X${sheetRowNumber}`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [
+          [
+            "Paid",
+            weekLabel || WEEK_LABELS[0],
+          ],
+        ],
+      },
+    });
+    return true;
   }
+  return false;
 }
 
 const WEEK_LABELS = [
@@ -76,17 +97,22 @@ const WEEK_LABELS = [
 const WEEK_KEYS = ["week1", "week2", "week3"] as const;
 
 const CAPACITY_PER_WEEK = 20;
+/** Reserved spots for week 1 (3 coach's kids + 6 forms.app pre-registrations). */
+const RESERVED_WEEK1 = 9;
 
 /**
- * Get available spots per week by counting registrations in the sheet (column L = Week).
- * Returns { week1: number, ... } for available spots, or null if sheet not configured.
+ * Get available spots per week.
+ * By default only counts "Paid" (payment confirmed) — so spots fill as payments complete.
+ * Option includePending: true counts both Paid and Pending (for validation so we don't over-accept form submissions).
  */
-export async function getSpotsPerWeek(): Promise<Record<string, number> | null> {
+export async function getSpotsPerWeek(options?: {
+  includePending?: boolean;
+}): Promise<Record<string, number> | null> {
   const client = getSheetsClient();
   if (!client) return null;
 
   const { sheets, sheetId, tabName } = client;
-  const range = `${tabName}!A2:L1000`;
+  const range = `${tabName}!A2:X1000`;
 
   const { data } = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
@@ -95,20 +121,31 @@ export async function getSpotsPerWeek(): Promise<Record<string, number> | null> 
 
   const rows = data.values as string[][] | undefined;
   if (!rows || rows.length === 0) {
-    return Object.fromEntries(WEEK_KEYS.map((k) => [k, CAPACITY_PER_WEEK]));
+    return {
+      week1: CAPACITY_PER_WEEK - RESERVED_WEEK1,
+      week2: CAPACITY_PER_WEEK,
+      week3: CAPACITY_PER_WEEK,
+    };
   }
 
-  const weekColIndex = 11;
+  const weekColIndex = 23;  // X
+  const statusColIndex = 22; // W
   const counts: Record<string, number> = { week1: 0, week2: 0, week3: 0 };
 
   for (const row of rows) {
+    const status = (row[statusColIndex] ?? "").trim();
+    if (options?.includePending) {
+      if (status !== "Paid" && status !== "Pending") continue;
+    } else {
+      if (status !== "Paid") continue;
+    }
     const weekLabel = (row[weekColIndex] ?? "").trim();
     const idx = WEEK_LABELS.indexOf(weekLabel as (typeof WEEK_LABELS)[number]);
     if (idx >= 0 && WEEK_KEYS[idx]) counts[WEEK_KEYS[idx]]++;
   }
 
   return {
-    week1: Math.max(0, CAPACITY_PER_WEEK - counts.week1),
+    week1: Math.max(0, CAPACITY_PER_WEEK - RESERVED_WEEK1 - counts.week1),
     week2: Math.max(0, CAPACITY_PER_WEEK - counts.week2),
     week3: Math.max(0, CAPACITY_PER_WEEK - counts.week3),
   };

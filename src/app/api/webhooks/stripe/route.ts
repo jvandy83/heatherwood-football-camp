@@ -60,7 +60,10 @@ export async function POST(request: NextRequest) {
 
     if (email) {
       try {
-        await markRegistrationPaidByEmail(email);
+        const updated = await markRegistrationPaidByEmail(email);
+        if (!updated) {
+          console.warn("Payment received but week was full or no Pending row found:", email);
+        }
       } catch (err) {
         console.error("Failed to update sheet with payment:", err);
         // Still return 200 so Stripe doesn't retry; the sheet update is best-effort

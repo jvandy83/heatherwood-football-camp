@@ -1,5 +1,13 @@
 import { google } from "googleapis";
 import { NextRequest, NextResponse } from "next/server";
+import { getSpotsPerWeek } from "@/lib/sheets";
+
+function splitName(full: string): [string, string] {
+  const t = full.trim();
+  const i = t.indexOf(" ");
+  if (i <= 0) return [t, ""];
+  return [t.slice(0, i), t.slice(i + 1).trim()];
+}
 
 async function appendToSheet(row: string[]) {
   const sheetId = process.env.GOOGLE_SHEET_ID;
@@ -22,7 +30,7 @@ async function appendToSheet(row: string[]) {
   });
 
   const sheets = google.sheets({ version: "v4", auth });
-  const range = `${tabName}!A:L`;
+  const range = `${tabName}!A:X`;
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
@@ -47,6 +55,11 @@ export async function POST(request: NextRequest) {
       childAge,
       registrationType,
       week,
+      tshirtSize,
+      experienceLevel,
+      gradeEntering,
+      extendedPickup,
+      pickupTime,
       emergencyName,
       emergencyPhone,
       medicalNotes,
@@ -78,25 +91,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Append to Google Sheet if configured (don't block registration on failure)
+    // Enforce capacity per week (count Paid + Pending so we don't over-accept)
+    if (week) {
+      const spots = await getSpotsPerWeek({ includePending: true });
+      if (spots && spots[week] !== undefined && spots[week] <= 0) {
+        return NextResponse.json(
+          { message: "That week is full. Please choose another week." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Append to Google Sheet in same column order as existing forms.app sheet, then Payment Status (W) and Week (X)
     const weekLabels: Record<string, string> = {
       week1: "Week 1: June 1–5",
       week2: "Week 2: June 8–12",
       week3: "Week 3: June 15–19",
     };
+    const [childFirst, childLast] = splitName(String(childName));
+    const [parentFirst, parentLast] = splitName(String(parentName));
     const sheetRow = [
-      new Date().toISOString(),
-      String(parentName),
-      String(email),
-      String(phone),
-      String(childName),
-      String(childAge),
-      registrationType === "sibling" ? "Sibling" : "First",
-      String(emergencyName),
-      String(emergencyPhone),
-      String(medicalNotes || ""),
-      "Pending",
-      week ? weekLabels[week] ?? String(week) : "",
+      childFirst,                    // A: Camper First Name
+      childLast,                     // B: Camper Last Name
+      "",                            // C: Camper DOB (we don't collect)
+      String(childAge),              // D: Camper's Age
+      String(gradeEntering ?? ""),   // E: Grade (Entering Fall)
+      parentFirst,                   // F: Parent First Name
+      parentLast,                    // G: Parent Last Name
+      String(email),                 // H: Parent Email
+      String(phone),                 // I: Parent Phone
+      "",                            // J: Home Address (we don't collect)
+      String(emergencyName),         // K: Emergency Contact Name
+      String(emergencyPhone),        // L: Emergency Contact Phone
+      extendedPickup === "yes" ? "Yes" : "No",  // M: Later pickup interest
+      extendedPickup === "yes" ? String(pickupTime ?? "") : "", // N: Pickup time
+      String(experienceLevel ?? ""), // O: Experience level
+      String(tshirtSize ?? ""),       // P: T-Shirt Size
+      String(medicalNotes ?? ""),    // Q: Allergies/medical
+      "",                            // R: Other instructions
+      "✓",                           // S: Waiver
+      "Website",                     // T: Submitter
+      new Date().toISOString(),      // U: Submission Date
+      "",                            // V: Submission ID
+      "Pending",                     // W: Payment Status
+      week ? weekLabels[week] ?? String(week) : "", // X: Week
     ];
     try {
       await appendToSheet(sheetRow);
