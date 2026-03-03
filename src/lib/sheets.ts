@@ -129,8 +129,31 @@ const WEEK_LABELS = [
 const WEEK_KEYS = ["week1", "week2", "week3"] as const;
 
 const CAPACITY_PER_WEEK = 20;
-/** Reserved spots for week 1 (3 coach's kids + 6 forms.app pre-registrations). */
-const RESERVED_WEEK1 = 9;
+
+/** Reserved spots per week (not in sheet — e.g. coach's kids, verbal commits). From env RESERVED_SPOTS_WEEK1, etc. */
+function getReservedSpots(): Record<string, number> {
+  const n = (key: string) => {
+    const v = process.env[key];
+    if (v === undefined || v === "") return key === "RESERVED_SPOTS_WEEK1" ? 11 : 0;
+    const num = parseInt(v, 10);
+    return Number.isNaN(num) ? 0 : Math.max(0, num);
+  };
+  return {
+    week1: n("RESERVED_SPOTS_WEEK1"),
+    week2: n("RESERVED_SPOTS_WEEK2"),
+    week3: n("RESERVED_SPOTS_WEEK3"),
+  };
+}
+
+/** Default spots when sheet is unavailable (capacity minus reserved per week). */
+export function getDefaultSpots(): Record<string, number> {
+  const r = getReservedSpots();
+  return {
+    week1: Math.max(0, CAPACITY_PER_WEEK - r.week1),
+    week2: Math.max(0, CAPACITY_PER_WEEK - r.week2),
+    week3: Math.max(0, CAPACITY_PER_WEEK - r.week3),
+  };
+}
 
 /**
  * Get available spots per week.
@@ -151,13 +174,10 @@ export async function getSpotsPerWeek(options?: {
     range,
   });
 
+  const reserved = getReservedSpots();
   const rows = data.values as string[][] | undefined;
   if (!rows || rows.length === 0) {
-    return {
-      week1: CAPACITY_PER_WEEK - RESERVED_WEEK1,
-      week2: CAPACITY_PER_WEEK,
-      week3: CAPACITY_PER_WEEK,
-    };
+    return getDefaultSpots();
   }
 
   const weekColIndex = 23;  // X
@@ -177,8 +197,8 @@ export async function getSpotsPerWeek(options?: {
   }
 
   return {
-    week1: Math.max(0, CAPACITY_PER_WEEK - RESERVED_WEEK1 - counts.week1),
-    week2: Math.max(0, CAPACITY_PER_WEEK - counts.week2),
-    week3: Math.max(0, CAPACITY_PER_WEEK - counts.week3),
+    week1: Math.max(0, CAPACITY_PER_WEEK - reserved.week1 - counts.week1),
+    week2: Math.max(0, CAPACITY_PER_WEEK - reserved.week2 - counts.week2),
+    week3: Math.max(0, CAPACITY_PER_WEEK - reserved.week3 - counts.week3),
   };
 }

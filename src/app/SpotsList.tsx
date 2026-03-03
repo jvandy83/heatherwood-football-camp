@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const DEFAULT_SPOTS = { week1: 11, week2: 20, week3: 20 };
+const DEFAULT_SPOTS = { week1: 9, week2: 20, week3: 20 }; // 20 - 11 reserved for week 1
 
 const WEEKS = [
   { key: "week1", label: "Week 1: June 1–5" },
