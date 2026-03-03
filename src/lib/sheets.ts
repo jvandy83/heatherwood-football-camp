@@ -1,6 +1,10 @@
 import { google } from "googleapis";
 
-function getSheetsClient() {
+export async function getSheetsClient(): Promise<{
+  sheets: ReturnType<typeof google.sheets>;
+  sheetId: string;
+  tabName: string;
+} | null> {
   const sheetId = process.env.GOOGLE_SHEET_ID;
   const tabName = process.env.GOOGLE_SHEET_TAB_NAME || "Sheet1";
   const credsJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
@@ -8,7 +12,8 @@ function getSheetsClient() {
 
   let credentials: { client_email?: string; private_key?: string };
   try {
-    credentials = JSON.parse(credsJson) as {
+    const normalized = credsJson.replace(/\r\n?|\n/g, "");
+    credentials = JSON.parse(normalized) as {
       client_email?: string;
       private_key?: string;
     };
@@ -21,7 +26,34 @@ function getSheetsClient() {
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
   const sheets = google.sheets({ version: "v4", auth });
-  return { sheets, sheetId, tabName };
+  const resolvedTitle = await resolveSheetTitle(sheets, sheetId, tabName);
+  return { sheets, sheetId, tabName: resolvedTitle };
+}
+
+/** Get the exact sheet title from the spreadsheet (fixes "Unable to parse range" when tab name differs). */
+async function resolveSheetTitle(
+  sheets: ReturnType<typeof google.sheets>,
+  spreadsheetId: string,
+  tabName: string
+): Promise<string> {
+  const res = await sheets.spreadsheets.get({
+    spreadsheetId,
+    fields: "sheets.properties(title)",
+  });
+  const titles = res.data.sheets?.map((s) => s.properties?.title).filter(Boolean) as string[] | undefined;
+  if (!titles?.length) return tabName;
+  const match = titles.find((t) => t === tabName || t.toLowerCase() === tabName.toLowerCase());
+  return match ?? titles[0];
+}
+
+/** Build a range string. Quote sheet name only when it contains spaces or special chars. */
+export function sheetRange(tabName: string, cellRange: string): string {
+  const needsQuotes = /[\s'()]/.test(tabName);
+  if (needsQuotes) {
+    const escaped = tabName.replace(/'/g, "''");
+    return `'${escaped}'!${cellRange}`;
+  }
+  return `${tabName}!${cellRange}`;
 }
 
 /**
@@ -31,11 +63,11 @@ function getSheetsClient() {
  * Returns true if updated, false if skipped (e.g. week full).
  */
 export async function markRegistrationPaidByEmail(email: string): Promise<boolean> {
-  const client = getSheetsClient();
+  const client = await getSheetsClient();
   if (!client) return false;
 
   const { sheets, sheetId, tabName } = client;
-  const range = `${tabName}!A2:X1000`;
+  const range = sheetRange(tabName, "A2:X1000");
   const normalizedEmail = email.trim().toLowerCase();
 
   const { data } = await sheets.spreadsheets.values.get({
@@ -72,7 +104,7 @@ export async function markRegistrationPaidByEmail(email: string): Promise<boolea
     const sheetRowNumber = i + 2;
     await sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
-      range: `${tabName}!W${sheetRowNumber}:X${sheetRowNumber}`,
+      range: sheetRange(tabName, `W${sheetRowNumber}:X${sheetRowNumber}`),
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [
@@ -108,11 +140,11 @@ const RESERVED_WEEK1 = 9;
 export async function getSpotsPerWeek(options?: {
   includePending?: boolean;
 }): Promise<Record<string, number> | null> {
-  const client = getSheetsClient();
+  const client = await getSheetsClient();
   if (!client) return null;
 
   const { sheets, sheetId, tabName } = client;
-  const range = `${tabName}!A2:X1000`;
+  const range = sheetRange(tabName, "A2:X1000");
 
   const { data } = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,

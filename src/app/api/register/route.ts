@@ -1,6 +1,5 @@
-import { google } from "googleapis";
 import { NextRequest, NextResponse } from "next/server";
-import { getSpotsPerWeek } from "@/lib/sheets";
+import { getSheetsClient, getSpotsPerWeek, sheetRange } from "@/lib/sheets";
 
 function splitName(full: string): [string, string] {
   const t = full.trim();
@@ -9,28 +8,15 @@ function splitName(full: string): [string, string] {
   return [t.slice(0, i), t.slice(i + 1).trim()];
 }
 
-async function appendToSheet(row: string[]) {
-  const sheetId = process.env.GOOGLE_SHEET_ID;
-  const tabName = process.env.GOOGLE_SHEET_TAB_NAME || "Sheet1";
-  const credsJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-
-  if (!sheetId || !credsJson) return;
-
-  let credentials: { client_email?: string; private_key?: string };
-  try {
-    credentials = JSON.parse(credsJson) as { client_email?: string; private_key?: string };
-  } catch {
-    console.error("Invalid GOOGLE_SERVICE_ACCOUNT_JSON");
-    return;
+async function appendToSheet(row: string[]): Promise<boolean> {
+  const client = await getSheetsClient();
+  if (!client) {
+    console.warn("Google Sheet not configured: GOOGLE_SHEET_ID or GOOGLE_SERVICE_ACCOUNT_JSON missing. Registration not saved to sheet.");
+    return false;
   }
 
-  const auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-  });
-
-  const sheets = google.sheets({ version: "v4", auth });
-  const range = `${tabName}!A:X`;
+  const { sheets, sheetId, tabName } = client;
+  const range = sheetRange(tabName, "A1:X");
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
@@ -41,6 +27,7 @@ async function appendToSheet(row: string[]) {
       values: [row],
     },
   });
+  return true;
 }
 
 export async function POST(request: NextRequest) {
@@ -136,11 +123,15 @@ export async function POST(request: NextRequest) {
       "Pending",                     // W: Payment Status
       week ? weekLabels[week] ?? String(week) : "", // X: Week
     ];
+    let sheetOk = false;
     try {
-      await appendToSheet(sheetRow);
+      sheetOk = await appendToSheet(sheetRow);
     } catch (err) {
       console.error("Google Sheet append failed:", err);
-      // Still return payment URL
+      // Still return payment URL so they can pay; sheet can be updated manually
+    }
+    if (!sheetOk) {
+      console.warn("Registration submitted but not saved to sheet (check Vercel env: GOOGLE_SHEET_ID, GOOGLE_SERVICE_ACCOUNT_JSON, and sheet shared with service account).");
     }
 
     const baseUrl =
