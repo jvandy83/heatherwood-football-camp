@@ -160,6 +160,31 @@ export async function POST(request: NextRequest) {
       }),
     });
 
+    const notifyEmail = process.env.REGISTRATION_NOTIFY_EMAIL;
+    if (notifyEmail) {
+      const adminSubject = `[Heatherwood Camp] New registration: ${String(childName).trim()} (${weekLabel ?? "no week"})`;
+      const adminText = [
+        "New registration submitted:",
+        "",
+        `Parent: ${parentName}`,
+        `Email: ${email}`,
+        `Phone: ${phone}`,
+        `Child: ${childName}, age ${childAge}`,
+        `Week: ${weekLabel ?? "—"}`,
+        `Type: ${registrationType === "sibling" ? "Sibling" : "Full"}`,
+        extendedPickup === "yes" ? `Extended pickup: Yes${pickupTime ? ` (${pickupTime})` : ""}` : "Extended pickup: No",
+        "",
+        "Payment: Pending (they were sent to Stripe).",
+      ]
+        .filter(Boolean)
+        .join("\n");
+      await sendMailgunEmail({
+        to: notifyEmail,
+        subject: adminSubject,
+        text: adminText,
+      });
+    }
+
     const baseUrl =
       registrationType === "sibling" ? paymentLinkSibling : paymentLinkFull;
     const separator = baseUrl.includes("?") ? "&" : "?";
