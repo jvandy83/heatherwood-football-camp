@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const DEFAULT_SPOTS = { week1: 9, week2: 20, week3: 20 }; // 20 - 5 reserved - 6 in sheet ≈ 9 for week 1
+const DEFAULT_SPOTS = { week1: 9, week2: 20, week3: 20 }; // 20 - 10 reserved; sheet rows (Paid/Pending) counted separately
 
 const WEEKS = [
   { key: "week1", label: "Week 1: June 1–5" },
