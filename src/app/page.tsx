@@ -18,7 +18,7 @@ export default function Home() {
           <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-sky-600">
             Boulder Summer Youth Football Camp
           </p>
-          <h1 className="text-4xl font-bold tracking-tight text-slate-800 sm:text-5xl">
+          <h1 className="font-display text-4xl font-bold tracking-tight text-slate-800 sm:text-5xl">
             Heatherwood Football Camp
           </h1>
           <p className="mt-4 text-lg text-slate-600 sm:text-xl">
@@ -63,13 +63,13 @@ export default function Home() {
               — and can throw a football farther than Uncle Rico. He&apos;s the father of 4 boys and understands the challenges of raising kids in a competitive environment. You can expect your child to have a lot of fun but also learn a lot about football, teamwork and discipline.
             </p>
           </div>
-          <div className="shrink-0">
+          <div className="w-full sm:w-auto sm:shrink-0">
             <Image
               src="/jared_profile_pic.jpg"
               alt="Coach Jared"
-              width={160}
-              height={160}
-              className="rounded-xl object-cover aspect-square w-36 h-36 sm:w-40 sm:h-40"
+              width={400}
+              height={400}
+              className="rounded-xl object-cover aspect-square w-full sm:w-40 sm:h-40"
             />
           </div>
         </section>
