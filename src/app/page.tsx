@@ -51,6 +51,29 @@ export default function Home() {
           </p>
         </section>
 
+        {/* Coach */}
+        <section className="mb-14 flex flex-col gap-4 rounded-2xl bg-slate-50 px-6 py-6 ring-1 ring-slate-200/60 sm:flex-row sm:items-center sm:gap-6 sm:px-8">
+          <div className="flex-1">
+            <h2 className="mb-3 text-xl font-bold text-slate-800">
+              Meet Coach Jared
+            </h2>
+            <p className="text-slate-700 leading-relaxed">
+              Jared has coached 4 seasons of flag football, was the head coach for
+              10U Boulder Bears and an assistant coach for the Lafayette Bobcats
+              — and can throw a football farther than Uncle Rico. He&apos;s the father of 4 boys and understands the challenges of raising kids in a competitive environment. You can expect your child to have a lot of fun but also learn a lot about football, teamwork and discipline.
+            </p>
+          </div>
+          <div className="shrink-0">
+            <Image
+              src="/jared_profile_pic.jpg"
+              alt="Coach Jared"
+              width={160}
+              height={160}
+              className="rounded-xl object-cover aspect-square w-36 h-36 sm:w-40 sm:h-40"
+            />
+          </div>
+        </section>
+
         {/* Camp Overview */}
         <section className="mb-14">
           <h2 className="mb-6 text-2xl font-bold text-slate-800">
@@ -104,7 +127,7 @@ export default function Home() {
             <strong>Camp runs through the month of June.</strong> Each week is
             Monday–Friday. Register for one or more weeks; pricing is per week.
           </p>
-<SpotsList />
+          <SpotsList />
           <p className="font-medium text-slate-800">
             Daily schedule: <strong>9:00am – 2:00pm</strong>
           </p>
