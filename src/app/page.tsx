@@ -52,7 +52,7 @@ export default function Home() {
         </section>
 
         {/* Coach */}
-        <section className="mb-14 flex flex-col gap-4 rounded-2xl bg-slate-50 px-6 py-6 ring-1 ring-slate-200/60 sm:flex-row sm:items-center sm:gap-6 sm:px-8">
+        <section className="mb-14 flex flex-col gap-4 rounded-2xl bg-slate-100 px-6 py-6 ring-1 ring-slate-200/60 sm:flex-row sm:items-center sm:gap-6 sm:px-8">
           <div className="flex-1">
             <h2 className="mb-3 text-xl font-bold text-slate-800">
               Meet Coach Jared
