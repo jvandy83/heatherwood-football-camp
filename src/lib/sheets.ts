@@ -134,7 +134,7 @@ const CAPACITY_PER_WEEK = 20;
 function getReservedSpots(): Record<string, number> {
   const n = (key: string) => {
     const v = process.env[key];
-    if (v === undefined || v === "") return key === "RESERVED_SPOTS_WEEK1" ? 10 : 0;
+    if (v === undefined || v === "") return key === "RESERVED_SPOTS_WEEK1" ? 8 : 0;
     const num = parseInt(v, 10);
     return Number.isNaN(num) ? 0 : Math.max(0, num);
   };
