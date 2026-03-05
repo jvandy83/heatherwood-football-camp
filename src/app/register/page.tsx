@@ -28,7 +28,7 @@ const EXPERIENCE_LEVELS = [
   "Playing at home and school",
 ] as const;
 
-const GRADES = ["3rd", "4th", "5th", "6th", "7th"] as const;
+const GRADES = ["2nd", "3rd", "4th", "5th", "6th", "7th"] as const;
 
 const PICKUP_TIMES = ["2:00pm", "2:30pm", "3:00pm", "3:30pm", "4:00pm"] as const;
 
