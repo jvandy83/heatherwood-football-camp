@@ -22,7 +22,7 @@ const oswald = Oswald({
 export const metadata: Metadata = {
   title: "Heatherwood Football Camp | Boulder Summer Youth Football",
   description:
-    "Small-group, skills-focused youth football camp in Boulder. Ages 7–11, non-contact. June at Heatherwood Elementary. $325/week.",
+    "Small-group, skills-focused youth football camp in Boulder. Ages 7–12, non-contact. June at Heatherwood Elementary. $325/week.",
 };
 
 export default function RootLayout({

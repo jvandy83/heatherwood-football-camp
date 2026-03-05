@@ -27,7 +27,7 @@ export default function Home() {
           <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-4 rounded-2xl bg-white/80 px-6 py-4 shadow-sm ring-1 ring-sky-200/60">
             <span className="font-semibold text-slate-800">Month of June</span>
             <span className="text-slate-400">•</span>
-            <span className="text-slate-700">Ages 7–11</span>
+            <span className="text-slate-700">Ages 7–12</span>
             <span className="text-slate-400">•</span>
             <span className="text-slate-700">Non-contact</span>
           </div>
@@ -83,7 +83,7 @@ export default function Home() {
             <li className="flex gap-3">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400" />
               <span>
-                <strong>Ages:</strong> 7–11
+                <strong>Ages:</strong> 7–12
               </span>
             </li>
             <li className="flex gap-3">

@@ -128,6 +128,17 @@ const WEEK_LABELS = [
 
 const WEEK_KEYS = ["week1", "week2", "week3"] as const;
 
+/** Map sheet Week cell to week key; accepts exact label or "Week 1" / "Week 2" / "Week 3". */
+function weekLabelToKey(weekLabel: string): string | null {
+  const trimmed = weekLabel.trim();
+  const idx = WEEK_LABELS.indexOf(trimmed as (typeof WEEK_LABELS)[number]);
+  if (idx >= 0) return WEEK_KEYS[idx];
+  if (/^Week\s*1\b/i.test(trimmed)) return "week1";
+  if (/^Week\s*2\b/i.test(trimmed)) return "week2";
+  if (/^Week\s*3\b/i.test(trimmed)) return "week3";
+  return null;
+}
+
 const CAPACITY_PER_WEEK = 20;
 
 /** Reserved spots per week (not in sheet — e.g. coach's kids, verbal commits). From env RESERVED_SPOTS_WEEK1, etc. */
@@ -186,14 +197,15 @@ export async function getSpotsPerWeek(options?: {
 
   for (const row of rows) {
     const status = (row[statusColIndex] ?? "").trim();
+    const statusLower = status.toLowerCase();
     if (options?.includePending) {
-      if (status !== "Paid" && status !== "Pending") continue;
+      if (statusLower !== "paid" && statusLower !== "pending") continue;
     } else {
-      if (status !== "Paid") continue;
+      if (statusLower !== "paid") continue;
     }
-    const weekLabel = (row[weekColIndex] ?? "").trim();
-    const idx = WEEK_LABELS.indexOf(weekLabel as (typeof WEEK_LABELS)[number]);
-    if (idx >= 0 && WEEK_KEYS[idx]) counts[WEEK_KEYS[idx]]++;
+    const weekLabel = row[weekColIndex] ?? "";
+    const weekKey = weekLabelToKey(weekLabel);
+    if (weekKey) counts[weekKey]++;
   }
 
   return {

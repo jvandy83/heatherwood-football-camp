@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const AGES = [7, 8, 9, 10, 11] as const;
+const AGES = [7, 8, 9, 10, 11, 12] as const;
 
 const WEEKS = [
   { value: "week1", label: "Week 1: June 1–5" },
@@ -101,8 +101,8 @@ export default function RegisterPage() {
       setError("Child's name is required.");
       return;
     }
-    if (childAge === "" || childAge < 7 || childAge > 11) {
-      setError("Please select child's age (7–11).");
+    if (childAge === "" || childAge < 7 || childAge > 12) {
+      setError("Please select child's age (7–12).");
       return;
     }
     if (!emergencyName.trim()) {
@@ -280,7 +280,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <label htmlFor="childAge" className="mb-1 block text-sm font-medium text-slate-700">
-                Age (7–11) *
+                Age (7–12) *
               </label>
               <select
                 id="childAge"
