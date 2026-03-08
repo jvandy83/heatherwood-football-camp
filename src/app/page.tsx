@@ -150,6 +150,9 @@ export default function Home() {
           <p className="text-slate-700">
             <strong>Heatherwood Elementary School</strong> — outdoor grass field.
           </p>
+          <p className="mt-3 text-slate-700">
+            Restrooms provided. Shade tent will be available.
+          </p>
         </section>
 
         {/* Daily Itinerary */}
