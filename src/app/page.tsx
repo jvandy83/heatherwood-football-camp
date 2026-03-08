@@ -5,31 +5,42 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       {/* Hero */}
-      <header className="relative overflow-hidden bg-gradient-to-b from-sky-100 to-sky-50/80 px-6 pt-12 pb-16 sm:px-8 sm:pt-16 sm:pb-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <Image
-            src="/football_camp_logo.png"
-            alt="Heatherwood Football Camp"
-            width={280}
-            height={120}
-            className="mx-auto mb-6 h-auto w-48 sm:w-64"
-            priority
-          />
-          <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-sky-600">
-            Boulder Summer Youth Football Camp
-          </p>
-          <h1 className="font-display text-4xl font-bold tracking-tight text-slate-800 sm:text-5xl">
-            Heatherwood Football Camp
-          </h1>
-          <p className="mt-4 text-lg text-slate-600 sm:text-xl">
-            Small-Group • Skills-Focused • Community-Based
-          </p>
-          <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-4 rounded-2xl bg-white/80 px-6 py-4 shadow-sm ring-1 ring-sky-200/60">
-            <span className="font-semibold text-slate-800">Month of June</span>
-            <span className="text-slate-400">•</span>
-            <span className="text-slate-700">Ages 7–12</span>
-            <span className="text-slate-400">•</span>
-            <span className="text-slate-700">Non-contact</span>
+      <header className="relative min-h-[28rem] overflow-hidden sm:min-h-[32rem]">
+        <Image
+          src="/flag-football-3.webp"
+          alt=""
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-slate-900/50" aria-hidden />
+        <div className="relative z-10 flex min-h-[28rem] flex-col items-center justify-center px-6 pt-12 pb-16 text-center sm:min-h-[32rem] sm:px-8 sm:pt-16 sm:pb-20">
+          <div className="mx-auto max-w-3xl">
+            <Image
+              src="/football_camp_logo.png"
+              alt="Heatherwood Football Camp"
+              width={280}
+              height={120}
+              className="mx-auto mb-6 h-auto w-48 rounded-2xl sm:w-64 drop-shadow-md"
+              priority
+            />
+            <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-sky-200">
+              Boulder Summer Youth Football Camp
+            </p>
+            <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl drop-shadow">
+              Heatherwood Football Camp
+            </h1>
+            <p className="mt-4 text-lg text-slate-200 sm:text-xl">
+              Small-Group • Skills-Focused • Community-Based
+            </p>
+            <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-4 rounded-2xl bg-white/90 px-6 py-4 shadow-lg ring-1 ring-white/20 backdrop-blur-sm">
+              <span className="font-semibold text-slate-800">Month of June</span>
+              <span className="text-slate-400">•</span>
+              <span className="text-slate-700">Ages 7–12</span>
+              <span className="text-slate-400">•</span>
+              <span className="text-slate-700">Non-contact</span>
+            </div>
           </div>
         </div>
       </header>
@@ -52,8 +63,17 @@ export default function Home() {
         </section>
 
         {/* Coach */}
-        <section className="mb-14 flex flex-col gap-4 rounded-2xl bg-slate-100 px-6 py-6 ring-1 ring-slate-200/60 sm:flex-row sm:items-center sm:gap-6 sm:px-8">
-          <div className="flex-1">
+        <section className="mb-14 overflow-hidden rounded-2xl bg-slate-100 ring-1 ring-slate-200/60">
+          <div className="w-full">
+            <Image
+              src="/jared_profile_pic.jpg"
+              alt="Coach Jared"
+              width={800}
+              height={600}
+              className="w-full rounded-t-2xl object-contain object-top"
+            />
+          </div>
+          <div className="px-6 py-6 sm:px-8">
             <h2 className="mb-3 text-xl font-bold text-slate-800">
               Meet Coach Jared
             </h2>
@@ -62,15 +82,6 @@ export default function Home() {
               10U Boulder Bears and an assistant coach for the Lafayette Bobcats
               — and can throw a football farther than Uncle Rico. He&apos;s the father of 4 boys and understands the challenges of raising kids in a competitive environment. You can expect your child to have a lot of fun but also learn a lot about football, teamwork and discipline.
             </p>
-          </div>
-          <div className="w-full sm:w-auto sm:shrink-0">
-            <Image
-              src="/jared_profile_pic.jpg"
-              alt="Coach Jared"
-              width={400}
-              height={400}
-              className="rounded-xl object-cover aspect-square w-full sm:w-40 sm:h-40"
-            />
           </div>
         </section>
 
