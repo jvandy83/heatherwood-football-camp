@@ -214,3 +214,88 @@ export async function getSpotsPerWeek(options?: {
     week3: Math.max(0, CAPACITY_PER_WEEK - reserved.week3 - counts.week3),
   };
 }
+
+const REMINDER_COOLDOWN_MS = 72 * 60 * 60 * 1000; // 72 hours
+const LAST_REMINDER_COL_INDEX = 24; // column Y
+
+/** Parse a cell value as a date; returns null if empty or unparseable. */
+function parseLastReminderCell(value: string | undefined): number | null {
+  const s = (value ?? "").trim();
+  if (!s) return null;
+  const t = Date.parse(s);
+  return Number.isNaN(t) ? null : t;
+}
+
+/**
+ * Rows that need a reminder: Pending and (no last reminder or last reminder > 72h ago).
+ * Returns one entry per unique email with all sheet row numbers to update after sending.
+ */
+export async function getPendingRegistrationEmails(): Promise<
+  { email: string; sheetRowNumbers: number[] }[] | null
+> {
+  const client = await getSheetsClient();
+  if (!client) return null;
+
+  const { sheets, sheetId, tabName } = client;
+  const range = sheetRange(tabName, "A2:Y1000");
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range,
+  });
+
+  const rows = data.values as string[][] | undefined;
+  if (!rows?.length) return [];
+
+  const emailColIndex = 7;
+  const statusColIndex = 22;
+  const now = Date.now();
+  const byEmail = new Map<string, number[]>();
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const status = (row[statusColIndex] ?? "").trim().toLowerCase();
+    if (status !== "pending") continue;
+    const email = (row[emailColIndex] ?? "").trim().toLowerCase();
+    if (!email) continue;
+    const lastReminder = parseLastReminderCell(row[LAST_REMINDER_COL_INDEX]);
+    if (lastReminder !== null && now - lastReminder < REMINDER_COOLDOWN_MS) continue;
+    const sheetRowNumber = i + 2;
+    const existing = byEmail.get(email);
+    if (existing) existing.push(sheetRowNumber);
+    else byEmail.set(email, [sheetRowNumber]);
+  }
+
+  return Array.from(byEmail.entries()).map(([email, sheetRowNumbers]) => ({
+    email,
+    sheetRowNumbers,
+  }));
+}
+
+/** Write "last reminder sent" (ISO date) to column Y for the given sheet rows. */
+export async function setLastReminderSent(sheetRowNumbers: number[]): Promise<boolean> {
+  if (sheetRowNumbers.length === 0) return true;
+  const client = await getSheetsClient();
+  if (!client) return false;
+
+  const { sheets, sheetId, tabName } = client;
+  const value = new Date().toISOString();
+
+  const updates = sheetRowNumbers.map((rowNum) => ({
+    range: sheetRange(tabName, `Y${rowNum}`),
+    values: [[value]],
+  }));
+
+  try {
+    await sheets.spreadsheets.values.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: {
+        valueInputOption: "USER_ENTERED",
+        data: updates,
+      },
+    });
+    return true;
+  } catch (err) {
+    console.error("setLastReminderSent failed:", err);
+    return false;
+  }
+}
