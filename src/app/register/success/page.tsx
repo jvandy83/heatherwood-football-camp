@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PurchaseConversion } from "./PurchaseConversion";
 
 export default function RegisterSuccessPage() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      <PurchaseConversion />
       <header className="border-b border-slate-200 bg-sky-50/80 px-6 py-6 sm:px-8">
         <div className="mx-auto flex max-w-2xl items-center justify-between">
           <Link href="/" className="flex items-center gap-3">

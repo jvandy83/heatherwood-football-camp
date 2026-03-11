@@ -34,8 +34,10 @@ Set these in **Vercel** → your project → **Settings** → **Environment Vari
 
 | Variable | Description |
 |----------|-------------|
+| `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_CONVERSION_LABEL` | Conversion label from Google Ads (Tools → Conversions → your purchase conversion → Tag setup). Used to fire the purchase conversion when users land on `/register/success`. |
 | `MAILGUN_HOST` | Default `api.mailgun.net`; use `api.eu.mailgun.net` for EU domain |
-| `REGISTRATION_NOTIFY_EMAIL` | Email to receive a copy of each new registration (admin notification) |
+| `REGISTRATION_NOTIFY_EMAIL` | Email to receive a copy of each new registration (admin notification). Also used for reminder run receipts if `REMINDER_NOTIFY_EMAIL` is not set. |
+| `REMINDER_NOTIFY_EMAIL` | Email to receive a receipt after each payment-reminder cron run (count and list of who was emailed). If unset, receipt goes to `REGISTRATION_NOTIFY_EMAIL` when set. |
 | `RESERVED_SPOTS_WEEK1` | Reserved spots for week 1 not in sheet (default 3) |
 | `RESERVED_SPOTS_WEEK2` | Reserved spots for week 2 (default 0) |
 | `RESERVED_SPOTS_WEEK3` | Reserved spots for week 3 (default 0) |

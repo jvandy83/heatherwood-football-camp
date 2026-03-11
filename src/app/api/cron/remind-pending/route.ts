@@ -42,6 +42,8 @@ export async function POST(request: Request) {
   return runReminders();
 }
 
+const RECEIPT_SUBJECT = "Heatherwood Football Camp — Payment reminder run";
+
 async function runReminders() {
   const pending = await getPendingRegistrationEmails();
   if (pending === null) {
@@ -51,6 +53,7 @@ async function runReminders() {
     );
   }
   let sent = 0;
+  const sentTo: string[] = [];
   for (const { email, sheetRowNumbers } of pending) {
     const ok = await sendMailgunEmail({
       to: email,
@@ -59,8 +62,23 @@ async function runReminders() {
     });
     if (ok) {
       sent++;
+      sentTo.push(email);
       await setLastReminderSent(sheetRowNumbers);
     }
   }
+
+  const notifyEmail = process.env.REMINDER_NOTIFY_EMAIL ?? process.env.REGISTRATION_NOTIFY_EMAIL;
+  if (notifyEmail) {
+    const receiptText =
+      sent === 0
+        ? "No payment reminder emails were sent (no pending registrations due for a reminder, or none qualified)."
+        : `Payment reminder run completed.\n\nSent ${sent} reminder(s) to:\n${sentTo.map((e) => `- ${e}`).join("\n")}`;
+    await sendMailgunEmail({
+      to: notifyEmail,
+      subject: `${RECEIPT_SUBJECT}: ${sent} sent`,
+      text: receiptText,
+    });
+  }
+
   return NextResponse.json({ ok: true, sent, total: pending.length });
 }
