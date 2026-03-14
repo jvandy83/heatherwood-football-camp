@@ -82,6 +82,21 @@ export default function Home() {
               10U Boulder Bears and an assistant coach for the Lafayette Bobcats
               — and can throw a football farther than Uncle Rico. He&apos;s the father of 4 boys and understands the challenges of raising kids in a competitive environment. You can expect your child to have a lot of fun but also learn a lot about football, teamwork and discipline.
             </p>
+            <p className="mt-4 text-slate-700 leading-relaxed">
+              His 4 boys have all attended Heatherwood Elementary while his
+              oldest son, Bronson, is currently in 6th grade at Platt Middle
+              School.
+            </p>
+            <p className="mt-4 text-sm text-slate-600">
+              <a
+                href="https://www.linkedin.com/in/vanthedev/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-sky-600 hover:underline"
+              >
+                View Coach Jared&apos;s LinkedIn
+              </a>
+            </p>
           </div>
         </section>
 
