@@ -307,8 +307,7 @@ export default function Home() {
         <section className="rounded-2xl bg-gradient-to-br from-sky-100 to-sky-50 px-6 py-10 ring-1 ring-sky-200/60 sm:px-10 sm:py-12">
           <h2 className="mb-6 text-2xl font-bold text-slate-800">Register</h2>
           <p className="mb-6 text-slate-700">
-            Fill out the form and complete payment in one flow. We&apos;ll follow
-            up with waiver forms and any final details.
+            Fill out the form and complete payment in one flow.
           </p>
           <a
             href="/register"

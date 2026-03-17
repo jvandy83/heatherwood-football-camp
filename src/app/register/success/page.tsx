@@ -32,8 +32,7 @@ export default function RegisterSuccessPage() {
             You&apos;re registered
           </h1>
           <p className="mb-8 text-slate-600">
-            Thank you for registering. Payment was successful. We&apos;ll send
-            waiver forms and final details to your email soon. See you at camp!
+            Thank you for registering. Payment was successful. See you at camp!
           </p>
           <Link
             href="/"
