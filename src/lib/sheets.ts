@@ -59,10 +59,14 @@ export function sheetRange(tabName: string, cellRange: string): string {
 /**
  * Find the first row with the given email and "Pending" or empty payment status.
  * Treats empty W (existing forms.app rows) as Pending so they get marked Paid when they pay.
- * Only marks as "Paid" if that week still has capacity. If row has no Week (X), treats as week 1 and fills X.
- * Returns true if updated, false if skipped (e.g. week full).
+ * By default only marks as "Paid" if that week still has capacity. Use skipCapacityCheck for admin corrections.
+ * If row has no Week (X), treats as week 1 and fills X.
+ * Returns true if updated, false if skipped (e.g. week full or no matching row).
  */
-export async function markRegistrationPaidByEmail(email: string): Promise<boolean> {
+export async function markRegistrationPaidByEmail(
+  email: string,
+  options?: { skipCapacityCheck?: boolean },
+): Promise<boolean> {
   const client = await getSheetsClient();
   if (!client) return false;
 
@@ -83,8 +87,8 @@ export async function markRegistrationPaidByEmail(email: string): Promise<boolea
   const statusColIndex = 22;
   const weekColIndex = 23;
 
-  const spots = await getSpotsPerWeek();
-  if (!spots) return false;
+  const spots = options?.skipCapacityCheck ? null : await getSpotsPerWeek();
+  if (!options?.skipCapacityCheck && !spots) return false;
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
@@ -97,7 +101,7 @@ export async function markRegistrationPaidByEmail(email: string): Promise<boolea
     const weekIdx = WEEK_LABELS.indexOf(weekLabel as (typeof WEEK_LABELS)[number]);
     const weekKey = weekIdx >= 0 ? WEEK_KEYS[weekIdx] : null;
     const effectiveWeek = weekKey ?? "week1";
-    if (spots[effectiveWeek] <= 0) {
+    if (spots != null && spots[effectiveWeek] <= 0) {
       return false;
     }
 

@@ -79,7 +79,7 @@ export default function Home() {
             </h2>
             <p className="text-slate-700 leading-relaxed">
               Jared has coached 4 seasons of flag football, was the head coach for
-              10U Boulder Bears and an assistant coach for the Lafayette Bobcats
+              10U Boulder Bears and an assistant coach for the Lafayette Bobcats 11U team
               — and can throw a football farther than Uncle Rico. He&apos;s the father of 4 boys and understands the challenges of raising kids in a competitive environment. You can expect your child to have a lot of fun but also learn a lot about football, teamwork and discipline.
             </p>
             <p className="mt-4 text-slate-700 leading-relaxed">

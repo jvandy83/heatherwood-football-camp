@@ -65,15 +65,20 @@ export async function POST(request: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
+    // Stripe often leaves customer_email null; use customer_details.email when present
     const email =
-      session.customer_email ??
-      (session.customer_details?.email as string | undefined);
+      (session.customer_email as string | null | undefined)?.trim() ||
+      (session.customer_details?.email as string | null | undefined)?.trim() ||
+      undefined;
 
     if (email) {
       try {
         const updated = await markRegistrationPaidByEmail(email);
         if (!updated) {
-          console.warn("Payment received but week was full or no Pending row found:", email);
+          console.warn(
+            "[Stripe webhook] Payment received but sheet not updated (no Pending row for email, or week full):",
+            email,
+          );
         } else {
           await sendMailgunEmail({
             to: email,
@@ -82,9 +87,11 @@ export async function POST(request: NextRequest) {
           });
         }
       } catch (err) {
-        console.error("Failed to update sheet with payment:", err);
+        console.error("[Stripe webhook] Failed to update sheet with payment:", err);
         // Still return 200 so Stripe doesn't retry; the sheet update is best-effort
       }
+    } else {
+      console.warn("[Stripe webhook] checkout.session.completed had no customer email");
     }
   }
 
