@@ -34,23 +34,13 @@ const PICKUP_TIMES = ["2:00pm", "2:30pm", "3:00pm", "3:30pm", "4:00pm"] as const
 
 type RegistrationType = "first" | "sibling";
 
-const FORM_DRAFT_KEY = "campRegisterDraftV1";
-const TRAILFUNDS_READY_KEY = "trailfundsUserReadyV1";
-const TRAILFUNDS_READY_QUERY_PARAM = "tfUserReady";
-const TRAILFUNDS_BASE_URL =
-  process.env.NEXT_PUBLIC_TRAILFUNDS_BASE_URL ?? "http://localhost:3000";
-const TRAILFUNDS_LOGIN_PATH =
-  process.env.NEXT_PUBLIC_TRAILFUNDS_LOGIN_PATH ?? "/api/auth/login";
-const TRAILFUNDS_ONBOARDING_PATH =
-  process.env.NEXT_PUBLIC_TRAILFUNDS_ONBOARDING_PATH ?? "/onboarding";
-
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [trailfundsReady, setTrailfundsReady] = useState(false);
 
   const [parentName, setParentName] = useState("");
   const [email, setEmail] = useState("");
+  const [confirmEmail, setConfirmEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState<number | "">("");
@@ -88,125 +78,6 @@ export default function RegisterPage() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [waiverModalOpen]);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const returnedFromOnboarding =
-      params.get(TRAILFUNDS_READY_QUERY_PARAM) === "1";
-
-    if (returnedFromOnboarding) {
-      sessionStorage.setItem(TRAILFUNDS_READY_KEY, "1");
-      params.delete(TRAILFUNDS_READY_QUERY_PARAM);
-      const nextQuery = params.toString();
-      const nextUrl = nextQuery
-        ? `${window.location.pathname}?${nextQuery}`
-        : window.location.pathname;
-      window.history.replaceState(null, "", nextUrl);
-    }
-
-    setTrailfundsReady(
-      returnedFromOnboarding ||
-        sessionStorage.getItem(TRAILFUNDS_READY_KEY) === "1",
-    );
-
-    const savedDraft = sessionStorage.getItem(FORM_DRAFT_KEY);
-    if (!savedDraft) return;
-    try {
-      const parsed = JSON.parse(savedDraft) as Partial<{
-        parentName: string;
-        email: string;
-        phone: string;
-        childName: string;
-        childAge: number | "";
-        registrationType: RegistrationType;
-        week: string;
-        tshirtSize: string;
-        experienceLevel: string;
-        gradeEntering: string;
-        extendedPickup: "yes" | "no";
-        pickupTime: string;
-        emergencyName: string;
-        emergencyPhone: string;
-        medicalNotes: string;
-        agreedToWaiver: boolean;
-      }>;
-
-      if (parsed.parentName !== undefined) setParentName(parsed.parentName);
-      if (parsed.email !== undefined) setEmail(parsed.email);
-      if (parsed.phone !== undefined) setPhone(parsed.phone);
-      if (parsed.childName !== undefined) setChildName(parsed.childName);
-      if (parsed.childAge !== undefined) setChildAge(parsed.childAge);
-      if (parsed.registrationType !== undefined) {
-        setRegistrationType(parsed.registrationType);
-      }
-      if (parsed.week !== undefined) setWeek(parsed.week);
-      if (parsed.tshirtSize !== undefined) setTshirtSize(parsed.tshirtSize);
-      if (parsed.experienceLevel !== undefined) {
-        setExperienceLevel(parsed.experienceLevel);
-      }
-      if (parsed.gradeEntering !== undefined) {
-        setGradeEntering(parsed.gradeEntering);
-      }
-      if (parsed.extendedPickup !== undefined) {
-        setExtendedPickup(parsed.extendedPickup);
-      }
-      if (parsed.pickupTime !== undefined) setPickupTime(parsed.pickupTime);
-      if (parsed.emergencyName !== undefined) setEmergencyName(parsed.emergencyName);
-      if (parsed.emergencyPhone !== undefined) {
-        setEmergencyPhone(parsed.emergencyPhone);
-      }
-      if (parsed.medicalNotes !== undefined) setMedicalNotes(parsed.medicalNotes);
-      if (parsed.agreedToWaiver !== undefined) {
-        setAgreedToWaiver(parsed.agreedToWaiver);
-      }
-    } catch {
-      sessionStorage.removeItem(FORM_DRAFT_KEY);
-    }
-  }, []);
-
-  const saveDraft = () => {
-    const draft = {
-      parentName,
-      email,
-      phone,
-      childName,
-      childAge,
-      registrationType,
-      week,
-      tshirtSize,
-      experienceLevel,
-      gradeEntering,
-      extendedPickup,
-      pickupTime,
-      emergencyName,
-      emergencyPhone,
-      medicalNotes,
-      agreedToWaiver,
-    };
-    sessionStorage.setItem(FORM_DRAFT_KEY, JSON.stringify(draft));
-  };
-
-  const startTrailfundsOnboarding = () => {
-    saveDraft();
-
-    const returnTo = new URL(window.location.href);
-    returnTo.searchParams.set(TRAILFUNDS_READY_QUERY_PARAM, "1");
-
-    const onboardingUrl = new URL(TRAILFUNDS_ONBOARDING_PATH, TRAILFUNDS_BASE_URL);
-    onboardingUrl.searchParams.set("returnTo", returnTo.toString());
-
-    if (email.trim()) onboardingUrl.searchParams.set("email", email.trim());
-
-    const [firstName, ...lastNameParts] = parentName.trim().split(/\s+/);
-    if (firstName) onboardingUrl.searchParams.set("firstName", firstName);
-    if (lastNameParts.length > 0) {
-      onboardingUrl.searchParams.set("lastName", lastNameParts.join(" "));
-    }
-
-    const loginUrl = new URL(TRAILFUNDS_LOGIN_PATH, TRAILFUNDS_BASE_URL);
-    loginUrl.searchParams.set("returnTo", onboardingUrl.toString());
-    window.location.href = loginUrl.toString();
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -221,6 +92,10 @@ export default function RegisterPage() {
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError("Please enter a valid email address.");
+      return;
+    }
+    if (confirmEmail.trim().toLowerCase() !== email.trim().toLowerCase()) {
+      setError("Email and confirm email do not match. Please double-check.");
       return;
     }
     if (!phone.trim()) {
@@ -249,10 +124,6 @@ export default function RegisterPage() {
     }
     if (!agreedToWaiver) {
       setError("You must agree to the waiver and release.");
-      return;
-    }
-    if (!trailfundsReady) {
-      startTrailfundsOnboarding();
       return;
     }
 
@@ -292,7 +163,6 @@ export default function RegisterPage() {
       }
 
       if (data.url) {
-        sessionStorage.removeItem(FORM_DRAFT_KEY);
         window.location.href = data.url;
         return;
       }
@@ -378,6 +248,19 @@ export default function RegisterPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-800 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="confirmEmail" className="mb-1 block text-sm font-medium text-slate-700">
+                Confirm email *
+              </label>
+              <input
+                id="confirmEmail"
+                type="email"
+                required
+                value={confirmEmail}
+                onChange={(e) => setConfirmEmail(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-800 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
               />
             </div>
@@ -662,29 +545,6 @@ export default function RegisterPage() {
                 read the camp details and safety information. *
               </span>
             </label>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-700">
-            {trailfundsReady ? (
-              <p>
-                Trailfunds account ready. You can continue directly to payment.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                <p>
-                  Before payment, you&apos;ll sign in and complete a quick
-                  Trailfunds profile (first and last name). You&apos;ll return
-                  here automatically.
-                </p>
-                <button
-                  type="button"
-                  onClick={startTrailfundsOnboarding}
-                  className="rounded-lg border border-sky-300 bg-sky-50 px-3 py-2 font-medium text-sky-700 hover:bg-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
-                >
-                  Sign in and create Trailfunds profile
-                </button>
-              </div>
-            )}
           </div>
 
           {waiverModalOpen && (
