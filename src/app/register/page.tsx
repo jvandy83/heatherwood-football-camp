@@ -57,9 +57,9 @@ export default function RegisterPage() {
   const [agreedToWaiver, setAgreedToWaiver] = useState(false);
   const [waiverModalOpen, setWaiverModalOpen] = useState(false);
   const [spots, setSpots] = useState<Record<string, number>>({
-    week1: 11,
-    week2: 20,
-    week3: 20,
+    week1: 17,
+    week2: 15,
+    week3: 17,
   });
 
   useEffect(() => {

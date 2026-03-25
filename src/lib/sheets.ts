@@ -145,18 +145,26 @@ function weekLabelToKey(weekLabel: string): string | null {
 
 const CAPACITY_PER_WEEK = 20;
 
+/** When env unset: week1=3, week2=5, week3=3 (holds not counted in sheet). Override with RESERVED_SPOTS_WEEKn. */
+const RESERVED_SPOTS_ENV_DEFAULTS = {
+  RESERVED_SPOTS_WEEK1: 3,
+  RESERVED_SPOTS_WEEK2: 5,
+  RESERVED_SPOTS_WEEK3: 3,
+} as const;
+
 /** Reserved spots per week (not in sheet — e.g. coach's kids, verbal commits). From env RESERVED_SPOTS_WEEK1, etc. */
 function getReservedSpots(): Record<string, number> {
-  const n = (key: string) => {
-    const v = process.env[key];
-    if (v === undefined || v === "") return key === "RESERVED_SPOTS_WEEK1" ? 3 : 0;
+  const read = (envKey: keyof typeof RESERVED_SPOTS_ENV_DEFAULTS) => {
+    const v = process.env[envKey];
+    const fallback = RESERVED_SPOTS_ENV_DEFAULTS[envKey];
+    if (v === undefined || v === "") return fallback;
     const num = parseInt(v, 10);
-    return Number.isNaN(num) ? 0 : Math.max(0, num);
+    return Number.isNaN(num) ? fallback : Math.max(0, num);
   };
   return {
-    week1: n("RESERVED_SPOTS_WEEK1"),
-    week2: n("RESERVED_SPOTS_WEEK2"),
-    week3: n("RESERVED_SPOTS_WEEK3"),
+    week1: read("RESERVED_SPOTS_WEEK1"),
+    week2: read("RESERVED_SPOTS_WEEK2"),
+    week3: read("RESERVED_SPOTS_WEEK3"),
   };
 }
 

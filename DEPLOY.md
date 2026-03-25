@@ -39,8 +39,8 @@ Set these in **Vercel** → your project → **Settings** → **Environment Vari
 | `REGISTRATION_NOTIFY_EMAIL` | Email to receive a copy of each new registration (admin notification). Also used for reminder run receipts if `REMINDER_NOTIFY_EMAIL` is not set. |
 | `REMINDER_NOTIFY_EMAIL` | Email to receive a receipt after each payment-reminder cron run (count and list of who was emailed). If unset, receipt goes to `REGISTRATION_NOTIFY_EMAIL` when set. |
 | `RESERVED_SPOTS_WEEK1` | Reserved spots for week 1 not in sheet (default 3) |
-| `RESERVED_SPOTS_WEEK2` | Reserved spots for week 2 (default 0) |
-| `RESERVED_SPOTS_WEEK3` | Reserved spots for week 3 (default 0) |
+| `RESERVED_SPOTS_WEEK2` | Reserved spots for week 2 (default 5) |
+| `RESERVED_SPOTS_WEEK3` | Reserved spots for week 3 (default 3) |
 
 ---
 

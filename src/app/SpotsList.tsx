@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-const DEFAULT_SPOTS = { week1: 17, week2: 20, week3: 20 }; // 20 - 3 reserved; sheet rows (Paid/Pending) counted separately
+// Until /api/spots loads: capacity 20 minus reserved (3 / 5 / 3) per sheets.ts getDefaultSpots()
+const DEFAULT_SPOTS = { week1: 17, week2: 15, week3: 17 };
 
 const WEEKS = [
   { key: "week1", label: "Week 1: June 1–5" },
