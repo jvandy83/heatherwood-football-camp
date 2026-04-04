@@ -61,13 +61,37 @@ export default function RegisterPage() {
     week2: 15,
     week3: 17,
   });
+  const [week3BlockedUntilWeek2Full, setWeek3BlockedUntilWeek2Full] =
+    useState(true);
 
   useEffect(() => {
     fetch("/api/spots")
       .then((res) => res.json())
-      .then((data) => setSpots(data))
+      .then((data) => {
+        if (!data || typeof data !== "object") return;
+        const o = data as Record<string, unknown>;
+        const w1 = o.week1;
+        const w2 = o.week2;
+        const w3 = o.week3;
+        if (
+          typeof w1 === "number" &&
+          typeof w2 === "number" &&
+          typeof w3 === "number"
+        ) {
+          setSpots({ week1: w1, week2: w2, week3: w3 });
+        }
+        if (typeof o.week3BlockedUntilWeek2Full === "boolean") {
+          setWeek3BlockedUntilWeek2Full(o.week3BlockedUntilWeek2Full);
+        }
+      })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (week3BlockedUntilWeek2Full && week === "week3") {
+      setWeek("week2");
+    }
+  }, [week3BlockedUntilWeek2Full, week]);
 
   useEffect(() => {
     if (!waiverModalOpen) return;
@@ -354,21 +378,32 @@ export default function RegisterPage() {
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-800 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
               >
                 {WEEKS.map((w) => {
-                const available = spots[w.value];
-                const spotsLabel =
-                  available <= 0 ? " (Full)" : ` (${available} spots available)`;
-                return (
-                  <option
-                    key={w.value}
-                    value={w.value}
-                    disabled={available <= 0}
-                  >
-                    {w.label}
-                    {spotsLabel}
-                  </option>
-                );
-              })}
+                  const available = spots[w.value];
+                  const week3Held =
+                    w.value === "week3" && week3BlockedUntilWeek2Full;
+                  const disabled = available <= 0 || week3Held;
+                  let suffix: string;
+                  if (week3Held) {
+                    suffix = " — opens when week 2 is full";
+                  } else if (available <= 0) {
+                    suffix = " (Full)";
+                  } else {
+                    suffix = ` (${available} spots available)`;
+                  }
+                  return (
+                    <option key={w.value} value={w.value} disabled={disabled}>
+                      {w.label}
+                      {suffix}
+                    </option>
+                  );
+                })}
               </select>
+              {week3BlockedUntilWeek2Full ? (
+                <p className="mt-2 text-sm text-slate-600">
+                  We&apos;re filling week 2 first. Week 3 unlocks automatically
+                  when week 2 sells out.
+                </p>
+              ) : null}
             </div>
             <div>
               <label htmlFor="tshirtSize" className="mb-1 block text-sm font-medium text-slate-700">

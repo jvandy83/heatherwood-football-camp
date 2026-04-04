@@ -178,6 +178,17 @@ export function getDefaultSpots(): Record<string, number> {
   };
 }
 
+/** When true (default), new registrations cannot choose week 3 until week 2 has no spots left. Set SEQUENTIAL_WEEKS=false or 0 to turn off. */
+export function isSequentialWeeksEnabled(): boolean {
+  const v = process.env.SEQUENTIAL_WEEKS;
+  return v !== "false" && v !== "0";
+}
+
+/** True when week 3 must be hidden/disabled for new signups (week 2 still has capacity). */
+export function isWeek3BlockedUntilWeek2Full(spots: Record<string, number>): boolean {
+  return isSequentialWeeksEnabled() && spots.week2 > 0;
+}
+
 /**
  * Get available spots per week.
  * By default only counts "Paid" (payment confirmed) — so spots fill as payments complete.

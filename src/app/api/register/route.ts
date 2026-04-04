@@ -4,7 +4,13 @@ import {
   buildRegistrationReceivedText,
   getRegistrationSubject,
 } from "@/lib/registration-email";
-import { getSheetsClient, getSpotsPerWeek, sheetRange } from "@/lib/sheets";
+import {
+  getDefaultSpots,
+  getSheetsClient,
+  getSpotsPerWeek,
+  isWeek3BlockedUntilWeek2Full,
+  sheetRange,
+} from "@/lib/sheets";
 
 function splitName(full: string): [string, string] {
   const t = full.trim();
@@ -93,6 +99,16 @@ export async function POST(request: NextRequest) {
       if (spots && spots[week] !== undefined && spots[week] <= 0) {
         return NextResponse.json(
           { message: "That week is full. Please choose another week." },
+          { status: 400 },
+        );
+      }
+      const spotsForSequential = spots ?? getDefaultSpots();
+      if (week === "week3" && isWeek3BlockedUntilWeek2Full(spotsForSequential)) {
+        return NextResponse.json(
+          {
+            message:
+              "Week 3 opens when week 2 is full. Please choose week 2, or contact us if you can only attend week 3.",
+          },
           { status: 400 },
         );
       }

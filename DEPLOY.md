@@ -41,6 +41,7 @@ Set these in **Vercel** → your project → **Settings** → **Environment Vari
 | `RESERVED_SPOTS_WEEK1` | Reserved spots for week 1 not in sheet (default 3) |
 | `RESERVED_SPOTS_WEEK2` | Reserved spots for week 2 (default 5) |
 | `RESERVED_SPOTS_WEEK3` | Reserved spots for week 3 (default 3) |
+| `SEQUENTIAL_WEEKS` | Set to `false` or `0` to allow week 3 signups before week 2 is full. When unset or any other value, week 3 shows as “opens when week 2 is full” until week 2 has zero spots left. |
 
 ---
 
