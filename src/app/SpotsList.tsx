@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-// Until /api/spots loads: capacity 20 minus reserved (3 / 5 / 3) per sheets.ts getDefaultSpots()
-const DEFAULT_SPOTS = { week1: 17, week2: 15, week3: 17 };
+// Until /api/spots loads: matches sheets.ts getDefaultSpots() (week1 cap 28, weeks 2–3 cap 20, minus reserves)
+const DEFAULT_SPOTS = { week1: 25, week2: 15, week3: 17 };
 
 const WEEKS = [
   { key: "week1", label: "Week 1: June 1–5" },

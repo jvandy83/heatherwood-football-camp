@@ -80,6 +80,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const ageNum = Number(childAge);
+    if (
+      !Number.isFinite(ageNum) ||
+      !Number.isInteger(ageNum) ||
+      ageNum < 7 ||
+      ageNum > 14
+    ) {
+      return NextResponse.json(
+        { message: "Child age must be between 7 and 14." },
+        { status: 400 },
+      );
+    }
+
     const paymentLinkFull = process.env.STRIPE_PAYMENT_LINK_FULL;
     const paymentLinkSibling = process.env.STRIPE_PAYMENT_LINK_SIBLING;
 

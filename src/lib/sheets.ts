@@ -143,7 +143,12 @@ function weekLabelToKey(weekLabel: string): string | null {
   return null;
 }
 
-const CAPACITY_PER_WEEK = 20;
+/** Max campers per week (Paid + Pending cannot exceed this per week). */
+const CAPACITY_BY_WEEK: Record<(typeof WEEK_KEYS)[number], number> = {
+  week1: 28,
+  week2: 20,
+  week3: 20,
+};
 
 /** When env unset: week1=3, week2=5, week3=3 (holds not counted in sheet). Override with RESERVED_SPOTS_WEEKn. */
 const RESERVED_SPOTS_ENV_DEFAULTS = {
@@ -172,9 +177,9 @@ function getReservedSpots(): Record<string, number> {
 export function getDefaultSpots(): Record<string, number> {
   const r = getReservedSpots();
   return {
-    week1: Math.max(0, CAPACITY_PER_WEEK - r.week1),
-    week2: Math.max(0, CAPACITY_PER_WEEK - r.week2),
-    week3: Math.max(0, CAPACITY_PER_WEEK - r.week3),
+    week1: Math.max(0, CAPACITY_BY_WEEK.week1 - r.week1),
+    week2: Math.max(0, CAPACITY_BY_WEEK.week2 - r.week2),
+    week3: Math.max(0, CAPACITY_BY_WEEK.week3 - r.week3),
   };
 }
 
@@ -232,9 +237,9 @@ export async function getSpotsPerWeek(options?: {
   }
 
   return {
-    week1: Math.max(0, CAPACITY_PER_WEEK - reserved.week1 - counts.week1),
-    week2: Math.max(0, CAPACITY_PER_WEEK - reserved.week2 - counts.week2),
-    week3: Math.max(0, CAPACITY_PER_WEEK - reserved.week3 - counts.week3),
+    week1: Math.max(0, CAPACITY_BY_WEEK.week1 - reserved.week1 - counts.week1),
+    week2: Math.max(0, CAPACITY_BY_WEEK.week2 - reserved.week2 - counts.week2),
+    week3: Math.max(0, CAPACITY_BY_WEEK.week3 - reserved.week3 - counts.week3),
   };
 }
 

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const AGES = [7, 8, 9, 10, 11, 12] as const;
+const AGES = [7, 8, 9, 10, 11, 12, 13, 14] as const;
 
 const WEEKS = [
   { value: "week1", label: "Week 1: June 1–5" },
@@ -28,7 +28,7 @@ const EXPERIENCE_LEVELS = [
   "Playing at home and school",
 ] as const;
 
-const GRADES = ["2nd", "3rd", "4th", "5th", "6th", "7th"] as const;
+const GRADES = ["2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"] as const;
 
 const PICKUP_TIMES = ["2:00pm", "2:30pm", "3:00pm", "3:30pm", "4:00pm"] as const;
 
@@ -57,7 +57,7 @@ export default function RegisterPage() {
   const [agreedToWaiver, setAgreedToWaiver] = useState(false);
   const [waiverModalOpen, setWaiverModalOpen] = useState(false);
   const [spots, setSpots] = useState<Record<string, number>>({
-    week1: 17,
+    week1: 25,
     week2: 15,
     week3: 17,
   });
@@ -130,8 +130,8 @@ export default function RegisterPage() {
       setError("Child's name is required.");
       return;
     }
-    if (childAge === "" || childAge < 7 || childAge > 12) {
-      setError("Please select child's age (7–12).");
+    if (childAge === "" || childAge < 7 || childAge > 14) {
+      setError("Please select child's age (7–14).");
       return;
     }
     if (!emergencyName.trim()) {
@@ -322,7 +322,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <label htmlFor="childAge" className="mb-1 block text-sm font-medium text-slate-700">
-                Age (7–12) *
+                Age (7–14) *
               </label>
               <select
                 id="childAge"
