@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isRegistrationOpen } from "@/lib/registration";
 import { getPendingRegistrationEmails, setLastReminderSent } from "@/lib/sheets";
 import { sendMailgunEmail } from "@/lib/mailgun";
 
@@ -45,6 +46,15 @@ export async function POST(request: Request) {
 const RECEIPT_SUBJECT = "Heatherwood Football Camp — Payment reminder run";
 
 async function runReminders() {
+  if (!isRegistrationOpen()) {
+    return NextResponse.json({
+      ok: true,
+      sent: 0,
+      total: 0,
+      skipped: "registration closed",
+    });
+  }
+
   const pending = await getPendingRegistrationEmails();
   if (pending === null) {
     return NextResponse.json(

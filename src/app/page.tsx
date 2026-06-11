@@ -1,4 +1,8 @@
 import Image from "next/image";
+import {
+  getRegistrationClosedMessage,
+  isRegistrationOpen,
+} from "@/lib/registration";
 import { SpotsList } from "./SpotsList";
 
 export default function Home() {
@@ -154,7 +158,13 @@ export default function Home() {
             <strong>Camp runs through the month of June.</strong> Each week is
             Monday–Friday. Register for one or more weeks; pricing is per week.
           </p>
-          <SpotsList />
+          {isRegistrationOpen() ? (
+            <SpotsList />
+          ) : (
+            <p className="mb-4 font-medium text-slate-800">
+              {getRegistrationClosedMessage()}
+            </p>
+          )}
           <p className="font-medium text-slate-800">
             Daily schedule: <strong>9:00am – 2:00pm</strong>
           </p>
@@ -307,24 +317,30 @@ export default function Home() {
         {/* Next Steps / CTA */}
         <section className="rounded-2xl bg-gradient-to-br from-sky-100 to-sky-50 px-6 py-10 ring-1 ring-sky-200/60 sm:px-10 sm:py-12">
           <h2 className="mb-6 text-2xl font-bold text-slate-800">Register</h2>
-          <p className="mb-6 text-slate-700">
-            Fill out the form and complete payment in one flow.
-          </p>
-          <a
-            href="/register"
-            className="inline-block rounded-xl bg-sky-500 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
-          >
-            Register →
-          </a>
-          <p className="mt-4 text-sm text-slate-600">
-            Already registered and need to pay?{" "}
-            <a
-              href="/register/pay"
-              className="font-medium text-sky-600 underline hover:text-sky-700"
-            >
-              Complete payment here
-            </a>
-          </p>
+          {isRegistrationOpen() ? (
+            <>
+              <p className="mb-6 text-slate-700">
+                Fill out the form and complete payment in one flow.
+              </p>
+              <a
+                href="/register"
+                className="inline-block rounded-xl bg-sky-500 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
+              >
+                Register →
+              </a>
+              <p className="mt-4 text-sm text-slate-600">
+                Already registered and need to pay?{" "}
+                <a
+                  href="/register/pay"
+                  className="font-medium text-sky-600 underline hover:text-sky-700"
+                >
+                  Complete payment here
+                </a>
+              </p>
+            </>
+          ) : (
+            <p className="text-slate-700">{getRegistrationClosedMessage()}</p>
+          )}
           <p className="mt-6 text-sm text-slate-600">
             Questions?{" "}
             <a

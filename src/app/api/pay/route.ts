@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  getRegistrationClosedMessage,
+  isRegistrationOpen,
+} from "@/lib/registration";
 
 /**
  * Payment-only: for people who already registered (e.g. via forms.app)
  * and just need to complete payment. No form data required.
  */
 export async function POST(request: NextRequest) {
+  if (!isRegistrationOpen()) {
+    return NextResponse.json(
+      { message: getRegistrationClosedMessage() },
+      { status: 403 },
+    );
+  }
+
   try {
     const body = await request.json().catch(() => ({}));
     const { email, registrationType } = body;

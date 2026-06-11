@@ -5,6 +5,10 @@ import {
   getRegistrationSubject,
 } from "@/lib/registration-email";
 import {
+  getRegistrationClosedMessage,
+  isRegistrationOpen,
+} from "@/lib/registration";
+import {
   getDefaultSpots,
   getSheetsClient,
   getSpotsPerWeek,
@@ -44,6 +48,13 @@ async function appendToSheet(row: string[]): Promise<boolean> {
 }
 
 export async function POST(request: NextRequest) {
+  if (!isRegistrationOpen()) {
+    return NextResponse.json(
+      { message: getRegistrationClosedMessage() },
+      { status: 403 },
+    );
+  }
+
   try {
     const body = await request.json();
 
